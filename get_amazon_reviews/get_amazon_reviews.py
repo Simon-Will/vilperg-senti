@@ -157,12 +157,35 @@ def get_reviews_from_soup(soup, product_id):
     return reviews
 
 def get_helpfulness(helpfulness_span):
+    """Extract the helpfulness from an amazon helpful_span.
+
+    Args:
+        helpfulness_span (str): A string like
+            '63 von 67 Kunden fanden die folgende Rezension hilfreich'.
+
+    Returns
+        helpfulness (Helpfulness): A Helpfulness namedtuple.
+
+    >>> get_stars('63 von 67 Kunden fanden die folgende Rezension hilfreich')
+    Helpfulness(helpful=63, total=67)
+    """
     helpfulness_pattern = re.compile(r'^\s*(\d+)\s+von\s+(\d+)\s.*$')
     m = helpfulness_pattern.match(helpfulness_span)
     (helpful, total) = m.groups()
     return Helpfulness(helpful, total)
 
 def get_date(date_span):
+    """Extract the date from an amazon date_span.
+
+    Args:
+        date_span (str): A string like 'am 20 März 1994'.
+
+    Returns
+        date (datetime.date): The date.
+
+    >>> get_stars('am 20. März 1994')
+    datetime.date(1994, 3, 20)
+    """
     date_pattern = re.compile(r'^\s*am\s+(\d+)\.\s+(\w+)\s+(\d+)\s*$')
     m = date_pattern.match(date_span)
     (day_string, month_string, year_string) = m.groups()
@@ -172,6 +195,20 @@ def get_date(date_span):
     return dt.date(year, month, day)
 
 def get_stars(star_span):
+    """Extract the number of stars from a star_span from amazon.
+
+    Args:
+        star_span (str): A string like '2.3 von 5 Sternen' or
+            '4 von 5 Sternen'
+
+    Returns
+        star_number (int): The number of stars.
+
+    >>> get_stars('2.3 von 5 Sternen')
+    2.3
+    >>> get_stars('.4 von 5 Sternen')
+    4
+    """
     star_pattern = re.compile(r'^\s*(\d)(?:,(\d))?\s.*$')
     m = star_pattern.match(star_span)
     stars = None
