@@ -40,6 +40,11 @@ class Amazon_overview:
         self.html = self.response.read()
 
     def get_products(self):
+        """Get all products on this overview as Amazon_product objects.
+
+        Returns:
+            products (list): All Amazon_product objects on this overview.
+        """
         products = []
         soup = BeautifulSoup(self.html, HTML_PARSER)
         for li in soup.find('div', id='atfResults').ul:
@@ -72,6 +77,15 @@ class No_next_overview(Exception):
     pass
 
 class Amazon_product:
+    """A product on amazon.
+
+    Attributes:
+        url (str): The url of the product site.
+        id (str): The id of the product. This is called ASIN in amazon.
+        title (str): The name of the product.
+        review_number (int): The number of reviews of the product.
+        stars (int): The number of stars of the product (out of 5).
+    """
     def __init__(self, url, id, title, review_number, stars):
         self.url = url
         self.id = id
@@ -80,13 +94,15 @@ class Amazon_product:
         self.stars = stars
 
     def get_reviews(self):
+        """Get all reviews of the product."""
         reviews = []
         for rs in self.generate_reviews_sites():
             soup = BeautifulSoup(rs, HTML_PARSER)
-            reviews.extend(get_reviews_from_soup(soup, self.id))
+            reviews.extend(get_reviews_from_reviews_soup(soup, self.id))
         return reviews
 
     def __str__(self):
+        """Return string holding title, stars, reviews and id."""
         s1 = 'Product: {0.title}\n'
         s2 = 'Stars: {0.stars} | Reviews: {0.review_number} | ID: {0.id}'
         s = s1 + s2
@@ -94,6 +110,12 @@ class Amazon_product:
         return formatted
 
     def generate_reviews_sites(self):
+        """Generate the amazon sites that hold the reviews. Typically, they
+        each hold 10 reviews.
+
+        Yields:
+            reviews_site (str): An amazon site holding 10 reviews.
+        """
         reviews_url_pattern = (
                 'http://www.amazon.de/product-reviews/{0}?pageNumber={1}' )
         # 10 reviews per site seems to be the default for amazon.
@@ -118,13 +140,24 @@ class Amazon_review:
         self.date = date
 
     def __str__(self):
+        """Return string holding title, stars, helpfulness and id."""
         s1 = 'Title: {0.title}\n'
         s2 = 'Stars: {0.stars} | Helpfulness: {0.helpfulness} | ID: {0.id}'
         s = s1 + s2
         formatted = s.format(self)
         return formatted
 
-def get_reviews_from_soup(soup, product_id):
+def get_reviews_from_reviews_soup(soup, product_id):
+    """Get all reviews as Amazon_review objects on a reviews site from a
+    BeautifulSoup representation of that site.
+
+    Args:
+        soup (BeautifulSoup): A BeautifulSoup representation of the html of
+        a reviews site.
+
+    Returns:
+        reviews (list): All reviews on that site as Amazon_review objects.
+    """
     reviews = []
     for r in soup.find('div', {'id' : 'cm_cr-review_list'}):
         if 'review' not in r['class']:
