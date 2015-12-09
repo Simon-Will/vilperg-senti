@@ -4,6 +4,7 @@
 import re
 from collections import namedtuple
 
+import time
 import datetime as dt
 from enum import Enum
 
@@ -116,8 +117,9 @@ class Amazon_product:
         return formatted
 
     def generate_reviews_sites(self):
-        """Generate the amazon sites that hold the reviews. Typically, they
-        each hold 10 reviews.
+        """Generate the amazon sites that hold the reviews.
+
+        Typically, they each hold 10 reviews.
 
         Yields:
             reviews_site (str): An amazon site holding 10 reviews.
@@ -169,8 +171,10 @@ class Amazon_review:
         return formatted
 
 def get_reviews_from_reviews_soup(soup, product_id):
-    """Get all reviews as Amazon_review objects on a reviews site from a
-    BeautifulSoup representation of that site.
+    """Get all reviews as Amazon_review objects on a reviews site.
+    
+    The reviews are constructed from a BeautifulSoup representation of that
+    site.
 
     Args:
         soup (BeautifulSoup): A BeautifulSoup representation of the html of
