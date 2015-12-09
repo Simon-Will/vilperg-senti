@@ -29,15 +29,23 @@ class GermanMonth(Enum):
     Dezember = 12
 
 class Amazon_overview:
+    """An amazon page advertising multiple products.
+
+    Attributes:
+        url (str): The url of the overview site.
+        html (str: The content of the overview site as html.
+    """
+
     def __init__(self, url):
+        """Initiate Amazon_overview by supplying its url."""
         self.url = url
         try:
-            self.response = ur.urlopen(url)
+            response = ur.urlopen(url)
         except ue.HTTPError as e:
             raise e
         except ue.URLError as e:
             raise e
-        self.html = self.response.read()
+        self.html = response.read()
 
     def get_products(self):
         """Get all products on this overview as Amazon_product objects.
@@ -84,9 +92,11 @@ class Amazon_product:
         id (str): The id of the product. This is called ASIN in amazon.
         title (str): The name of the product.
         review_number (int): The number of reviews of the product.
-        stars (int): The number of stars of the product (out of 5).
+        stars (int): The number of stars (as rating) of the product (out of 5).
     """
+
     def __init__(self, url, id, title, review_number, stars):
+        """Initiate Amazon_product with all its attributes."""
         self.url = url
         self.id = id
         self.title = title
@@ -130,7 +140,20 @@ class Amazon_product:
 Helpfulness = namedtuple('Helpfulness', 'helpful, total')
 
 class Amazon_review:
+    """A review for an amazon product.
+
+    Attributes:
+        id (str): The id of the review.
+        title (str): The title of the review.
+        text (str): The content of the review.
+        stars (float): The stars given as a rating by the reviewer.
+        helpfulness (Helpfulness): The helpfulness of the review.
+        product_id (str): The id of the product the review belongs to.
+        date (datetime.date): The date on which the review was submitted.
+    """
+
     def __init__(self, id, title, text, stars, helpfulness, product_id, date):
+        """Initiate Amazon_product with all its attributes."""
         self.id = id
         self.title = title
         self.text = text
