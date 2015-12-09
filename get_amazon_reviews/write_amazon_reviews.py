@@ -20,7 +20,7 @@ def write_reviews_from_products(products, out_dir):
             p_f.write('{0}\n'.format(p))
 
         reviews = p.get_reviews()
-        r_dir = '{0}/{1}'.format(p_dir, reviews)
+        r_dir = '{0}/reviews'.format(p_dir)
         ensure_dir(r_dir)
         for r in reviews:
             with open('{0}/{1}'.format(r_dir, r.id), 'w') as r_f:
