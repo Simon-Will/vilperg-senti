@@ -107,10 +107,11 @@ class Amazon_product:
         return reviews
 
     def __str__(self):
-        """Return string holding title, stars, reviews and id."""
+        """Return string holding title, url, stars, reviews and id."""
         s1 = 'Product: {0.title}\n'
-        s2 = 'Stars: {0.stars} | Reviews: {0.review_number} | ID: {0.id}'
-        s = s1 + s2
+        s2 = 'URL: {0.url}\n'
+        s3 = 'Stars: {0.stars} | Reviews: {0.review_number} | ID: {0.id}'
+        s = s1 + s2 + s3
         formatted = s.format(self)
         return formatted
 
@@ -159,10 +160,11 @@ class Amazon_review:
         self.date = date
 
     def __str__(self):
-        """Return string holding title, stars, helpfulness and id."""
+        """Return string holding title, stars, helpfulness, date and id."""
         s1 = 'Title: {0.title}\n'
-        s2 = 'Stars: {0.stars} | Helpfulness: {0.helpfulness} | ID: {0.id}'
-        s = s1 + s2
+        s2 = 'Stars: {0.stars} | Helpfulness: {0.helpfulness}'
+        s3 = 'Date: {0.date} | ID: {0.id}'
+        s = s1 + s2 + s3
         formatted = s.format(self)
         return formatted
 
