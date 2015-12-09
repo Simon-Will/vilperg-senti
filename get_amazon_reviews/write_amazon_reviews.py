@@ -42,7 +42,7 @@ def write_products(products, out_dir):
         r_dir = '{0}/reviews'.format(p_dir)
         write_reviews(p, r_dir)
 
-def write_reviews(product, directory)
+def write_reviews(product, directory):
     """Write the reviews of a product in a directory.
 
     Args:
@@ -78,7 +78,7 @@ def main():
     start_url = sys.argv[1]
     out_dir = sys.argv[2]
     products = get_all_products(start_url)
-    write_reviews_from_products(products, out_dir)
+    write_products(products, out_dir)
 
 if __name__ == '__main__':
     main()
