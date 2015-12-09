@@ -19,7 +19,7 @@ def write_reviews_from_products(products, out_dir):
         with open(p_info, 'w') as p_f:
             p_f.write('{0}\n'.format(p))
 
-        reviews = products.get_reviews()
+        reviews = p.get_reviews()
         r_dir = '{0}/{1}'.format(p_dir, reviews)
         ensure_dir(r_dir)
         for r in reviews:
