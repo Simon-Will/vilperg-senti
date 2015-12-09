@@ -38,12 +38,8 @@ class Amazon_overview:
     def __init__(self, url):
         """Initiate Amazon_overview by supplying its url."""
         self.url = url
-        try:
-            response = ur.urlopen(url)
-        except ue.HTTPError as e:
-            raise e
-        except ue.URLError as e:
-            raise e
+
+        response = get_http_response(url)
         self.html = response.read()
 
     def get_products(self):
@@ -133,7 +129,8 @@ class Amazon_product:
         max_site_number = (self.review_number // reviews_per_site) + 1
         for i in range(1, max_site_number + 1):
             reviews_url = reviews_url_pattern.format(self.id, i)
-            reviews_site = ur.urlopen(reviews_url).read()
+            reponse = get_http_response(reviews_url)
+            reviews_site = reponse.read()
             yield reviews_site
 
 Helpfulness = namedtuple('Helpfulness', 'helpful, total')
@@ -198,7 +195,7 @@ def get_reviews_from_reviews_soup(soup, product_id):
             helpfulness_span = ( r.find('div', {'class' : 'helpful-votes-count'}).
                     span.get_text(strip=True) )
             helpfulness = get_helpfulness(helpfulness_span)
-        except AttributeError as e:
+        except AttributeError:
             # No-one has voted on the helpfulness of this review.
             helpfulness = Helpfulness(0, 0)
 
@@ -218,7 +215,7 @@ def get_helpfulness(helpfulness_span):
         helpfulness_span (str): A string like
             '63 von 67 Kunden fanden die folgende Rezension hilfreich'.
 
-    Returns
+    Returns:
         helpfulness (Helpfulness): A Helpfulness namedtuple.
 
     >>> get_helpfulness('63 von 67 Kunden fanden die folgende Rezension hilfreich')
@@ -235,7 +232,7 @@ def get_date(date_span):
     Args:
         date_span (str): A string like 'am 20 März 1994'.
 
-    Returns
+    Returns:
         date (datetime.date): The date.
 
     >>> get_date('am 20. März 1994')
@@ -256,7 +253,7 @@ def get_stars(star_span):
         star_span (str): A string like '2.3 von 5 Sternen' or
             '4 von 5 Sternen'
 
-    Returns
+    Returns:
         star_number (float): The number of stars.
 
     >>> get_stars('2,3 von 5 Sternen')
@@ -274,6 +271,36 @@ def get_stars(star_span):
         (units, tenths) = m.groups()
         stars = float('{0}.{1}'.format(units, tenths))
     return stars
+
+def get_http_response(url, max_tries=None):
+    """Try to get an HTTPResponse from a url with a number of tries.
+
+    Args:
+        url (str): An http url.
+        max_tries (int): How often the response should be requested.
+            Default: None
+    """
+    url_request_successful = False
+    tries = 0
+    reponse = None
+    while not url_request_successful:
+        # If the http request was unsuccessful, don't give up.
+        # Wait a moment and try it again.
+        try:
+            response = ur.urlopen(url)
+            url_request_successful = True
+        except ue.HTTPError:
+            time.sleep(0.2)
+        except ue.URLError as e:
+            raise e
+
+        if max_tries is not None and tries >= max_tries:
+            mess = 'Could not get {0} after {1} tries'.format(url, max_tries)
+            raise ue.HTTPError(mess)
+        else:
+            tries += 1
+
+    return response
 
 def test():
     import doctest
