@@ -23,7 +23,7 @@ def write_reviews_from_products(products, out_dir):
         r_dir = '{0}/{1}'.format(p_dir, reviews)
         ensure_dir(r_dir)
         for r in reviews:
-            with open('{0}/{1}'.format(r_dir, r.id)) as r_f:
+            with open('{0}/{1}'.format(r_dir, r.id), 'w') as r_f:
                 header = str(r)
                 r_f.write('{0}\n\n{1}'.format(header, r.text))
 
