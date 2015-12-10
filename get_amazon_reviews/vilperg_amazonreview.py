@@ -285,6 +285,9 @@ def get_http_response(url, max_tries=None):
         url (str): An http url.
         max_tries (int): How often the response should be requested.
             Default: None
+
+    Returns:
+        response (http.client.HTTPRespone): An HTTPResponse object.
     """
     url_request_successful = False
     tries = 0
