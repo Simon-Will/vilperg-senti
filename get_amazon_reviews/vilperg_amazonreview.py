@@ -12,7 +12,7 @@ import urllib.request as ur
 import urllib.error as ue
 from bs4 import BeautifulSoup
 
-HTML_PARSER = 'html.parser'
+HTML_PARSER = 'lxml'
 
 class GermanMonth(Enum):
     Januar = 1
