@@ -40,7 +40,6 @@ class Amazon_overview:
     def __init__(self, url):
         """Initiate Amazon_overview by supplying its url."""
         self.url = url
-
         response = get_http_response(url)
         self.html = response.read()
 
@@ -164,8 +163,6 @@ class Amazon_product:
             reviews_site = reponse.read()
             yield reviews_site
 
-Helpfulness = namedtuple('Helpfulness', 'helpful, total')
-
 class Amazon_review:
     """A review for an amazon product.
 
@@ -241,6 +238,22 @@ def get_reviews_from_reviews_soup(soup, product_id):
             product_id, date))
 
     return reviews
+
+Helpfulness = namedtuple('Helpfulness', 'helpful, total')
+
+def formatHelpfulness(helpfulness):
+    """Format a Helpfulness namedtuple and return a string representation.
+
+    Args:
+        helpfulness (Helpfulness): The Helpfulness namedtuple
+
+    Returns:
+        formatted (str): The Helpfulness namedtuple as a string.
+
+    >>> formatHelpfulness(Helpfulness(24, 45))
+    'Helpful: 24/45'
+    """
+    return 'Helpful: {0.helpful}/{0.total}'.format(helpfulness)
 
 def get_helpfulness(helpfulness_span):
     """Extract the helpfulness from an amazon helpful_span.

@@ -59,8 +59,9 @@ def write_reviews(product, top_dir):
 
         with open('{0}/info'.format(r_dir), 'w') as f:
             info1 = '{0.id}\n{0.title}\n{0.stars}\n'
-            info2 = '{0.helpfulness}\n{0.product_id}\n{0.date}\n'
-            info = (info1 + info2).format(r)
+            info2 = '{1}\n{0.product_id}\n{0.date}\n'
+            info = (info1 + info2).format(
+                    r, amaz.formatHelpfulness(r.helpfulness))
             f.write(info)
 
 def ensure_dir(d):
