@@ -8,6 +8,7 @@ import time
 import datetime as dt
 from enum import Enum
 
+import urllib.parse as up
 import urllib.request as ur
 import urllib.error as ue
 from bs4 import BeautifulSoup
@@ -43,6 +44,10 @@ class Amazon_overview:
         response = get_http_response(url)
         self.html = response.read()
 
+    def __str__(self):
+        s = '<Amazon_overview url={0} >'.format(self.url)
+        return s
+
     def get_products(self):
         """Get all products on this overview as Amazon_product objects.
 
@@ -75,7 +80,30 @@ class Amazon_overview:
         return products
     
     def get_next_overview(self):
-        pass
+        """Get the overview site following this one.
+
+        Returns:
+            next_overview (Amazon_overview): The next Amazon_overview site.
+        """
+        soup = BeautifulSoup(self.html, HTML_PARSER)
+        # The div with the id 'pagn' contains the links to the other overviews.
+        pagn = soup.find('div', id='pagn')
+        found_cur = False
+        for t in pagn:
+            if t.name != 'span':
+                continue
+
+            if found_cur == True and 'pagnLink' in t['class']:
+                # Found the t linking to the next overview. Construct it.
+                url_part = t.a['href']
+                url_part = up.quote(url_part)
+                url = 'http://amazon.de/{0}'.format(url_part)
+                return Amazon_overview(url)
+
+            elif 'pagnCur' in t['class']:
+                found_cur = True
+
+        raise No_next_overview('This is the last overview page')
 
 class No_next_overview(Exception):
     pass
