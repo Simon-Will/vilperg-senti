@@ -11,6 +11,7 @@ from enum import Enum
 import urllib.request as ur
 import urllib.error as ue
 from bs4 import BeautifulSoup
+import lxml.etree as le
 
 HTML_PARSER = 'lxml'
 
@@ -98,7 +99,8 @@ class Amazon_product:
         self.title = title
         self.review_number = review_number
         self.stars = stars
-
+        #self.reviews = self.get_reviews()
+        
     def get_reviews(self):
         """Get all reviews of the product."""
         reviews = []
@@ -136,6 +138,53 @@ class Amazon_product:
             reviews_site = reponse.read()
             yield reviews_site
 
+    def write_xml(self, out_file):
+    """Write xml represantation of this Amazon_product to a file.
+
+    Args:
+        out_file (str): The name of the output file.
+
+    >>> p = write_xml(Amazon_product(), 'f')
+    """
+
+        xml = le.Element('xml')
+        product = le.Element('product')
+        product_url = le.Element('product_url')
+        product_title = le.Element('product_title')
+        product_id = le.Element('product_id')
+        review_number = le.Element('review_number')
+        review_list = le.Element('review_list')
+        product_stars = le.Element('product_stars')
+
+        xml.append(product)
+        product.append(product_url)
+        product.append(product_id)
+        product.append(product_title)
+        product.append(product_stars)	
+        product.append(review_number)
+        product.append(review_list)
+
+        for r in self.reviews:
+            
+            review = le.Element('review')
+            title = le.Element('title')
+            text = le.Element('text')
+            stars = le.Element('stars')
+            helpfulness = le.Element('helpfulness')
+            date = le.Element('date')
+            id = le.Element('id')
+            
+            review_list.append(review)
+            review.append(id)
+            review.append(title)
+            review.append(text)
+            review.append(stars)
+            review.append(helpfulness)
+            review.append(date)
+            
+        print lxml.etree.tostring(xml,pretty_print = True)
+
+        
 Helpfulness = namedtuple('Helpfulness', 'helpful, total')
 
 class Amazon_review:
