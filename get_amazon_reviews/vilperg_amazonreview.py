@@ -64,14 +64,24 @@ class Amazon_overview:
             url = a['href']
             title = a['title']
 
+            stars = 0
+            review_number = 0
             i =  li.find('i', {'class' : 'a-icon-star'})
-            star_span = i.span.get_text(strip=True)
-            stars = get_stars(star_span)
-
-            # XXX: There might be a better way to get the review_number_tag.
-            review_number_tag = i.parent.parent.parent.parent.find(
-                    'a', {'class' : 'a-link-normal'})
-            review_number = int(review_number_tag.get_text(strip=True))
+            if i is not None:
+                # If the product has received no reviews, it has neither stars
+                # nor reviews.
+                star_span = i.span.get_text(strip=True)
+                stars = get_stars(star_span)
+                # XXX: There might be a better way to get the review_number_tag.
+                review_number_tag = i.parent.parent.parent.parent.find(
+                        'a', {'class' : 'a-link-normal'})
+                try:
+                    review_number_text = review_number_tag.get_text(strip=True)
+                    review_number = int(re.sub(r'\.', '', review_number_text))
+                except ValueError:
+                    # If this does not work for some reason, just proceed with
+                    # the next product.
+                    continue
 
             products.append(
                     Amazon_product(url, id, title, review_number, stars))
@@ -128,6 +138,10 @@ class Amazon_product:
 
     def get_reviews(self):
         """Get all reviews of the product."""
+
+        if self.review_number == 0:
+            return []
+
         reviews = []
         for rs in self.generate_reviews_sites():
             soup = BeautifulSoup(rs, HTML_PARSER)

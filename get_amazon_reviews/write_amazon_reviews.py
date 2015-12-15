@@ -65,7 +65,7 @@ def write_reviews(product, top_dir):
             f.write(info)
 
 def ensure_dir(d):
-    """Ensure that the directory exists.
+    """Create a directory if it does not already exist.
     
     Args:
         d (str): A directory.
@@ -73,10 +73,38 @@ def ensure_dir(d):
     if not os.path.exists(d):
         os.makedirs(d)
 
-def main():
-    """Get the amazon products and their reviews from an overview page and
+def write_all_overviews(start_url, out_dir):
+    """Write all reviews of products of this and following overview pages.
+
+    Get the amazon products and their reviews from an overview page and
     write all the products and their reviews to a directory structure, the top
-    of which is out_dir.
+    of which is out_dir. Then get the next overview page and do it again and
+    so on.
+
+    Args:
+        start_url: The url of the overview page.
+        out_dir: The top of the directory structure for the products and
+            reviews.
+    """
+    overview = amaz.Amazon_overview(start_url)
+    write_products(overview.get_products(), out_dir)
+
+    while True:
+        # Print all following overviews.
+        try:
+            overview = overview.get_next_overview()
+        except amaz.No_next_overview:
+            # All overviews have been processed.
+            break
+        write_products(overview.get_products(), out_dir)
+
+def main():
+    """Write all reviews of products of this and following overview pages.
+
+    Get the amazon products and their reviews from an overview page and
+    write all the products and their reviews to a directory structure, the top
+    of which is out_dir. Then get the next overview page and do it again and
+    so on.
 
     Command line arguments:
         start_url: The url of the overview page.
@@ -85,8 +113,7 @@ def main():
     """
     start_url = sys.argv[1]
     out_dir = sys.argv[2]
-    products = get_all_products(start_url)
-    write_products(products, out_dir)
+    write_all_overviews(start_url, out_dir)
 
 if __name__ == '__main__':
     main()
