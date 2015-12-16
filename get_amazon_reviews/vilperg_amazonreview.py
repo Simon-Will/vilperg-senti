@@ -40,7 +40,6 @@ class Amazon_overview:
     def __init__(self, url):
         """Initiate Amazon_overview by supplying its url."""
         self.url = url
-
         response = get_http_response(url)
         self.html = response.read()
 
@@ -65,14 +64,24 @@ class Amazon_overview:
             url = a['href']
             title = a['title']
 
+            stars = 0
+            review_number = 0
             i =  li.find('i', {'class' : 'a-icon-star'})
-            star_span = i.span.get_text(strip=True)
-            stars = get_stars(star_span)
-
-            # XXX: There might be a better way to get the review_number_tag.
-            review_number_tag = i.parent.parent.parent.parent.find(
-                    'a', {'class' : 'a-link-normal'})
-            review_number = int(review_number_tag.get_text(strip=True))
+            if i is not None:
+                # If the product has received no reviews, it has neither stars
+                # nor reviews.
+                star_span = i.span.get_text(strip=True)
+                stars = get_stars(star_span)
+                # XXX: There might be a better way to get the review_number_tag.
+                review_number_tag = i.parent.parent.parent.parent.find(
+                        'a', {'class' : 'a-link-normal'})
+                try:
+                    review_number_text = review_number_tag.get_text(strip=True)
+                    review_number = int(re.sub(r'\.', '', review_number_text))
+                except ValueError:
+                    # If this does not work for some reason, just proceed with
+                    # the next product.
+                    continue
 
             products.append(
                     Amazon_product(url, id, title, review_number, stars))
@@ -129,6 +138,10 @@ class Amazon_product:
 
     def get_reviews(self):
         """Get all reviews of the product."""
+
+        if self.review_number == 0:
+            return []
+
         reviews = []
         for rs in self.generate_reviews_sites():
             soup = BeautifulSoup(rs, HTML_PARSER)
@@ -163,8 +176,6 @@ class Amazon_product:
             reponse = get_http_response(reviews_url)
             reviews_site = reponse.read()
             yield reviews_site
-
-Helpfulness = namedtuple('Helpfulness', 'helpful, total')
 
 class Amazon_review:
     """A review for an amazon product.
@@ -241,6 +252,22 @@ def get_reviews_from_reviews_soup(soup, product_id):
             product_id, date))
 
     return reviews
+
+Helpfulness = namedtuple('Helpfulness', 'helpful, total')
+
+def formatHelpfulness(helpfulness):
+    """Format a Helpfulness namedtuple and return a string representation.
+
+    Args:
+        helpfulness (Helpfulness): The Helpfulness namedtuple
+
+    Returns:
+        formatted (str): The Helpfulness namedtuple as a string.
+
+    >>> formatHelpfulness(Helpfulness(24, 45))
+    'Helpful: 24/45'
+    """
+    return 'Helpful: {0.helpful}/{0.total}'.format(helpfulness)
 
 def get_helpfulness(helpfulness_span):
     """Extract the helpfulness from an amazon helpful_span.
