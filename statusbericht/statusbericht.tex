@@ -1,0 +1,175 @@
+\documentclass[a4paper]{article}
+
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\usepackage[
+	backend=biber,
+	citestyle=authoryear,
+	sortlocale=de_DE
+]{biblatex}
+\addbibresource{statusbericht.bib}
+
+\newcommand{\ourhighlight}[1]{\textit{#1}}
+\newcommand{\ourfile}[1]{\texttt{#1}}
+\newcommand{\ourextension}[1]{\texttt{#1}}
+
+\title{Statusbericht: Sentimentanalyse auf Amazon-Reviews\\[0.5cm]
+\large \textit{Designing Experiments for Machine Learning Tasks}\\[0.2cm]
+\large bei Éva Mújdricza-Maydt\\[0.2cm]
+\large Institut für Computerlinguistik\\[0.2cm]
+\large Ruprecht-Karls-Universität Heidelberg\\}
+
+\author{Caroline Berg \and Simon Will}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Motivation}
+
+Ziel unseres Projektes ist es, mit Methoden des Maschinellen Lernens aus den Texten von Amazon-Reviews, die zu einer bestimmten Produktklasse gehören, die jeweilige zum Review gehörige Bewertung (1--5 Sterne) vorherzusagen.
+Dabei möchten wir feststellen, ob die Käufer ihre Bewertungen so eindeutig formulieren, dass es mithilfe von Maschinellem Lernen möglich ist, sie entsprechend ihrer angegebenen Bewertung zu klassifizieren.
+Besonderes Augenmerk wollen wir darauf legen, herauszufinden, welche Attribute am hilfreichsten beim Lernen sind.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Ressourcen}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Amazon-Reviews}
+Datengrundlage unseres Projekts sind Amazon-Bewertungen von Smartphones.
+Um diese Texte herunterzuladen, verwenden wir ein Python-Skript (s.~\ref{scraper}), welches die entsprechende Überblicksseite auf Amazon aufruft und die Review-Texte zusammen mit Meta-Informationen wie der Bewertung abspeichert. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{SentiWS}
+SentiWS ist eine öffentlich zugängliche deutschsprachige Datenbank, für \ourhighlight{sentiment analysis} und \ourhighlight{opinion mining}, wobei die dort aufgeführten Wörter im Intervall $[-1;1]$ je nach ihrem \ourhighlight{sentiment} gewichtet und mit einem POS-Tag versehen sind. \autocite[vgl. S.~1168]{sentiws} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Module}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Amazon-Scraper}
+\label{scraper}
+Das Modul \ourfile{vilperg\_amazonreview.py} ermöglicht den Zugriff auf Amazon-Produkte und Amazon-Reviews.
+Das Skript \ourfile{write\_amazon\_reviews.py} schaut auf einer Überlicksseite von Amazon\footnote{Z.\,B. \url{http://www.amazon.de/Handys-Telefone/b/ref=sv_hv_1?ie=UTF8&node=3468301}} alle angezeigten Produkte und deren Reviews an und lädt Information über sie herunter.
+Dann wird die darauf folgende Überlicksseite aufgerufen und Informationen über die angezeigten Produkte und Reviews heruntergeladen, usw.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\ourextension{arff}-Ersteller und Attribut-Ersteller}
+\label{make_arff}
+Es soll ein Skript geschrieben werden, das eine \ourextension{arff}-Datei erstellt.
+Die Attribute für die \ourextension{arff}-Datei sollen dabei beim Aufrufen des Skripts angegeben werden können.
+So können dann dynamisch verschiedene \ourextension{arff}-Dateien erstellt werden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Attribute}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{overall\_sentiment}
+Das Attribut overall\_sentiment errechnet sich aus den \ourhighlight{sentiments} der Wörter in jedem einzelnen Review.
+Die jeweiligen \ourhighlight{sentiments} beziehen wir aus dem Datensatz SentiWS. Wörter, die nicht in SentiWS aufgeführt werden, werden ignoriert.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Sentiments der Wortarten}
+Die \ourhighlight{sentiments} werden noch einmal für verschiedene Wortarten einzeln erfasst: noun\_sentiment, verb\_sentiment und adjective\_sentiment.
+Hierbei wird mithilfe der POS-Tags für die jeweilige Wortart ein sentiment-Wert errechnet, analog zu overall\_sentiment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Sentiments zu Schlüsselwörter}
+Es sollen für Domäne der Reviews (z.\,B. Smartphones) die Schlüsselwörter gefunden werden, indem die Texte aus der Domäne mit einem größeren Textaussschnitt allgemeinerer Texte verglichen werdenlüsselwörter gefunden werden, indem die Texte aus der Domäne mit einem größeren Textaussschnitt allgemeinerer Texte verglichen werden.
+Für jedes Schlüsselwort soll dann ein Attribut erstellt werden, dessen Wert sich aus den \ourhighlight{sentiments} der Wörter in der Umgebung des jeweiligen Schlüsselwortes errechnet.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Länge des Textes}
+Das Attribut beschreibt die Länge des Textes in Wörtern.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Satzzeichen}
+Weitere interessante Attribute stellen besondere Vorkommen von Satzzeichen wie z.\,B. `!' oder `\ldots' dar.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Stand der Dinge und weiterer Ausblick}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Stand der Dinge}
+Wir haben bereits mithilfe des Amazon-Scrapers (s.~\ref{scraper}) erfolgreich Reviews heruntergeladen.
+Jetzt soll die Tokenisierung folgen, die wir für die POS-Tags benötigen und es sollen die einfacheren Attribute extrahiert werden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Probleme}
+Bisher haben wir noch nicht entschieden, wie wir mit informell geschriebenen Kommentaren umgehen (falsch geschriebene Wörter, Kleinschreibung, abweichende Zeichensetzung).
+Ein weiteres Problem ist, dass die Reviews sehr selten mit 2 oder 3 Sternen bewertet werden. Daher müssen wir noch überlegen, inwiefern wir dies gewichten und in unsere Reviewauswahl mit einfließen lassen.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Ausblick}
+Als nächstes geht es darum die heruntergeladenen Reviews für die Weiterverarbeitung mit WeKa zu formatieren, bzw. die oben genannten Features aus den Rohdaten zu extrahieren. 
+Ein besonderes Augenmerk werden wir darauf legen, die Extraktion der verschiedenen Attribute modular zu gestalten, sodass \ourextension{arff}-Dateien leicht mit beliebiger Attribut-Kombination erstellt werden können.
+So können wir später eine gute Evaluationen der Nützlichkeit der Attribute durchführen. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Einteilung}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Caroline Berg}
+\begin{itemize}
+	\item Zwischenbericht
+	\item Attribut-Extraktion
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simon Will}
+\begin{itemize}
+	\item Struktur der Programme
+	\item Amazon-Scraper
+	\item Keyword-Extraktion
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\printbibliography
+
+\end{document}

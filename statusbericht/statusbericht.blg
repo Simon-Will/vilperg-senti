@@ -1,0 +1,15 @@
+[0] Config.pm:321> INFO - This is Biber 1.9
+[1] Config.pm:324> INFO - Logfile is 'statusbericht.blg'
+[56] biber:277> INFO - === Wed Dec 16, 2015, 14:25:03
+[56] Biber.pm:334> INFO - Reading 'statusbericht.bcf'
+[192] Biber.pm:636> INFO - Found 1 citekeys in bib section 0
+[226] Biber.pm:3052> INFO - Processing section 0
+[263] Biber.pm:3190> INFO - Looking for bibtex format file 'statusbericht.bib' for section 0
+[264] bibtex.pm:979> INFO - Decoding LaTeX character macros into UTF-8
+[265] bibtex.pm:853> INFO - Found BibTeX data source 'statusbericht.bib'
+[315] UCollate.pm:66> INFO - Overriding locale 'de_DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[316] UCollate.pm:66> INFO - Overriding locale 'de_DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[316] Biber.pm:2929> INFO - Sorting list 'nty' of type 'entry' with scheme 'nty' and locale 'de_DE'
+[316] Biber.pm:2933> INFO - No sort tailoring available for locale 'de_DE'
+[321] bbl.pm:517> INFO - Writing 'statusbericht.bbl' with encoding 'UTF-8'
+[321] bbl.pm:606> INFO - Output to statusbericht.bbl
