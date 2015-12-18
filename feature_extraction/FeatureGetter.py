@@ -8,7 +8,7 @@ import re
 class Feature_getter:
     pass
 
-class Single_feature_getter(self, Feature_getter):
+class Single_feature_getter(Feature_getter):
     def __init__():
         self.feature_name = ''
         self.feature_type = ''
@@ -17,14 +17,14 @@ class Single_feature_getter(self, Feature_getter):
         # "Abstract" method.
         pass
 
-class SentiWS_based_feature_getter(self, Single_feature_getter):
+class SentiWS_based_feature_getter(Single_feature_getter):
     def __init__(senti_dict):
         self.senti_dict = senti_dict
 
-class Plain_feature_getter(self, Single_feature_getter):https://code.google.com/p/arff/
+class Plain_feature_getter(Single_feature_getter):https://code.google.com/p/arff/
     pass
 
-class Multi_feature_getter(self, Feature_getter):
+class Multi_feature_getter(Feature_getter):
 
     def get_feature_triples(review):
         # "Abstract" method.
@@ -32,7 +32,7 @@ class Multi_feature_getter(self, Feature_getter):
 
 # Concrete classes for actual getters:
 
-class Token_number_getter(self, Plain_feature_getter):
+class Token_number_getter(Plain_feature_getter):
 
     def get_value(self, tagged_text):
         """Count the tokens in review.
@@ -42,13 +42,13 @@ class Token_number_getter(self, Plain_feature_getter):
         Returns:
             count (int): The number of tokens in the review.
         """
-        count = len(self.tagged_text)
+        count = len(tagged_text)
         return count
 
-class Type_number_getter(self, Plain_feature_getter):
+class Type_number_getter(Plain_feature_getter):
     pass
 
-class Overall_sentiment_getter(self, SentiWS_based_feature_getter):
+class Overall_sentiment_getter(SentiWS_based_feature_getter):
     #sum of word-sentiments that are found in the review text
     def __init__(self, senti_dict):
         self.senti_dict = senti_dict
@@ -57,13 +57,13 @@ class Overall_sentiment_getter(self, SentiWS_based_feature_getter):
         
     def get_overall_sentiment(self, tagged_text):
 	value = 0
-	for item in self.tagged_text:
+	for item in tagged_text:
 	    if item[0] in self.senit_dict:
 		value += self.senit_dict[item[0]]
 	return value
       
 
-class Adjective_sentiment_getter(self, SentiWS_based_feature_getter):
+class Adjective_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of ADJ POS-Tags in tagged_text
     pos = re. compile(r'ADJ.+')
     
@@ -75,14 +75,14 @@ class Adjective_sentiment_getter(self, SentiWS_based_feature_getter):
     def get_value(self, tagged_text):
         #sum of all adjective sentiments
         value = 0
-        for item in self.tagged_text:
+        for item in tagged_text:
             if pos.match(item[1]):
                 if item[0] in self.senti_dict:
                     value += self.senti_dict[item[0]]
         return value
                     
 
-class Verb_sentiment_getter(self, SentiWS_based_feature_getter):
+class Verb_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of VERB POS-Tags in tagged_text
     pos = re.compile(r'V.+')
     
@@ -94,14 +94,14 @@ class Verb_sentiment_getter(self, SentiWS_based_feature_getter):
     def get_value(self, tagged_text):
         #sum of all verb sentiments
         value = 0
-        for item in self.tagged_text:
+        for item in tagged_text:
             if pos.match(item[1]):
                 if item[0] in self.senti_dict:
                     value += self.senti_dict[item[0]]
         return value
     
 
-class Noun_sentiment_getter(self, SentiWS_based_feature_getter):
+class Noun_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of NOUN POS-Tags in tagged_text
     pos = re.compile(r'NN')
     
@@ -113,7 +113,7 @@ class Noun_sentiment_getter(self, SentiWS_based_feature_getter):
     def get_value(self, tagged_text):
         #sum of all noun sentiments
         value = 0
-        for item in self.tagged_text:
+        for item in tagged_text:
             if pos.match(item[1]):
                 if item[0] in self.senti_dict:
                     value += self.senti_dict[item[0]]
@@ -121,7 +121,7 @@ class Noun_sentiment_getter(self, SentiWS_based_feature_getter):
         
         
 
-class Keyword_feature_getter(self, Multi_feature_getter):
+class Keyword_feature_getter(Multi_feature_getter):
     def __init__(keywords):
         self.keywords = []
 
