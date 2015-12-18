@@ -21,7 +21,7 @@ class SentiWS_based_feature_getter(Single_feature_getter):
     def __init__(senti_dict):
         self.senti_dict = senti_dict
 
-class Plain_feature_getter(Single_feature_getter):https://code.google.com/p/arff/
+class Plain_feature_getter(Single_feature_getter):
     pass
 
 class Multi_feature_getter(Feature_getter):
@@ -33,6 +33,10 @@ class Multi_feature_getter(Feature_getter):
 # Concrete classes for actual getters:
 
 class Token_number_getter(Plain_feature_getter):
+
+    def __init__(self):
+        self.feature_name = 'token_number'
+        self.feature_type = 'numeric'
 
     def get_value(self, tagged_text):
         """Count the tokens in review.
@@ -56,12 +60,11 @@ class Overall_sentiment_getter(SentiWS_based_feature_getter):
         self.feature_type = 'numeric'
         
     def get_overall_sentiment(self, tagged_text):
-	value = 0
-	for item in tagged_text:
-	    if item[0] in self.senit_dict:
-		value += self.senit_dict[item[0]]
-	return value
-      
+        value = 0
+        for item in tagged_text:
+            if item[0] in self.senit_dict:
+                value += self.senit_dict[item[0]]
+        return value
 
 class Adjective_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of ADJ POS-Tags in tagged_text
@@ -80,7 +83,6 @@ class Adjective_sentiment_getter(SentiWS_based_feature_getter):
                 if item[0] in self.senti_dict:
                     value += self.senti_dict[item[0]]
         return value
-                    
 
 class Verb_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of VERB POS-Tags in tagged_text
@@ -100,7 +102,6 @@ class Verb_sentiment_getter(SentiWS_based_feature_getter):
                     value += self.senti_dict[item[0]]
         return value
     
-
 class Noun_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of NOUN POS-Tags in tagged_text
     pos = re.compile(r'NN')
@@ -118,8 +119,6 @@ class Noun_sentiment_getter(SentiWS_based_feature_getter):
                 if item[0] in self.senti_dict:
                     value += self.senti_dict[item[0]]
         return value
-        
-        
 
 class Keyword_feature_getter(Multi_feature_getter):
     def __init__(keywords):
