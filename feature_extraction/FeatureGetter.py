@@ -21,7 +21,7 @@ class SentiWS_based_feature_getter(Single_feature_getter):
     def __init__(senti_dict):
         self.senti_dict = senti_dict
 
-class Plain_feature_getter(Single_feature_getter):
+class Plain_feature_getter(Single_feature_getter):https://code.google.com/p/arff/
     pass
 
 class Multi_feature_getter(Feature_getter):
@@ -34,7 +34,7 @@ class Multi_feature_getter(Feature_getter):
 
 class Token_number_getter(Plain_feature_getter):
 
-    def get_value(tagged_text):
+    def get_value(self, tagged_text):
         """Count the tokens in review.
         Args:
             tagged_text (list): A list of lists. Each of the inner lists
@@ -49,22 +49,30 @@ class Type_number_getter(Plain_feature_getter):
     pass
 
 class Overall_sentiment_getter(SentiWS_based_feature_getter):
-    def __init__(senti_dict):
+    #sum of word-sentiments that are found in the review text
+    def __init__(self, senti_dict):
         self.senti_dict = senti_dict
-        self.featurename = 'overall_sentiment'
-        # TODO: Put the correct feature_type here.
-        self.feature_type = 'integer'
+        self.feature_name = 'overall_sentiment'
+        self.feature_type = 'numeric'
+        
+    def get_overall_sentiment(self, tagged_text):
+	value = 0
+	for item in tagged_text:
+	    if item[0] in self.senit_dict:
+		value += self.senit_dict[item[0]]
+	return value
+      
 
 class Adjective_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of ADJ POS-Tags in tagged_text
     pos = re. compile(r'ADJ.+')
     
-    def __init__(senti_dict):
+    def __init__(self, senti_dict):
         self.senti_dict = senti_dict
-        self.featurename = 'adjective_sentiment'
-        self.feature_type = 'integer'
+        self.feature_name = 'adjective_sentiment'
+        self.feature_type = 'numeric'
         
-    def get_value(tagged_text):
+    def get_value(self, tagged_text):
         #sum of all adjective sentiments
         value = 0
         for item in tagged_text:
@@ -78,12 +86,12 @@ class Verb_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of VERB POS-Tags in tagged_text
     pos = re.compile(r'V.+')
     
-    def __init__(senti_dict):
+    def __init__(self, senti_dict):
         self.senti_dict = senti_dict
-        self.featurename = 'verb_sentiment'
-        self. feature_type = 'integer'
+        self.feature_name = 'verb_sentiment'
+        self. feature_type = 'numeric'
         
-    def get_value(tagged_text):
+    def get_value(self, tagged_text):
         #sum of all verb sentiments
         value = 0
         for item in tagged_text:
@@ -97,12 +105,12 @@ class Noun_sentiment_getter(SentiWS_based_feature_getter):
     #consider all kinds of NOUN POS-Tags in tagged_text
     pos = re.compile(r'NN')
     
-    def __init_(senti_dict):
+    def __init_(self, senti_dict):
         self.senti_dict = senti_dict
-        self.featurename = 'noun_sentiment'
-        self.feature_type = 'integer'
+        self.feature_name = 'noun_sentiment'
+        self.feature_type = 'numeric'
         
-    def get_value(tagged_text):
+    def get_value(self, tagged_text):
         #sum of all noun sentiments
         value = 0
         for item in tagged_text:
@@ -117,10 +125,10 @@ class Keyword_feature_getter(Multi_feature_getter):
     def __init__(keywords):
         self.keywords = []
 
-    def get_keywords(keywords):
+    def get_keywords(self, keywords):
         return self.keywords
 
-    def get_feature_triples(review):
+    def get_feature_triples(self, review):
         """Get all (keyword, feature_type, sentiment)-triples for a review.
         """
         pass
