@@ -15,7 +15,7 @@ def get_senti_dict(sentiws_file):
     """
     line_pat = re.compile(r'^([^|]+)\|(\S+)\t(\S+)(?:\t(\S*))?\n$')
     senti_dict = {}
-    for line in sentiws_file:
+    for line in open(sentiws_file):
         mat = line_pat.match(line)
         if not mat:
             raise Not_SentiWS_file('Line unreadable: {0}'.format(line))
@@ -34,7 +34,7 @@ class Not_SentiWS_file(Exception):
     pass
 
 def test():
-    test_file = open('test_sentiws')
+    test_file = 'test_sentiws'
     print(get_senti_dict(test_file))
 
 if __name__ == '__main__':
