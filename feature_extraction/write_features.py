@@ -181,7 +181,7 @@ def main():
             choices=['overwrite', 'update', 'append'], default='append',
             help='Decide what to do if the file out_file_name already exists.')
 
-    parser.add_argument('--follow_links', '-f',
+    parser.add_argument('--follow_links', '-l',
             action='store_true', default=False,
             help='''Enables following symbolic links. when looking for
             in_file_name''')
