@@ -7,10 +7,14 @@ use File::Find;
 use File::Basename;
 use Getopt::Long;
 use Set::Scalar;
+use POSIX qw(strftime);
+use List::Util qw(shuffle);
 
 our $without = '';
 our $housing_dir = '';
 our $chunk_size = 0;
+our $balance = 0;
+our $star_line = 3;
 my $help = 0;
 
 my $Usage = <<"EOT";
@@ -28,6 +32,12 @@ OPTIONS
             this script.
     -c, --chunk-size
         The number of links that are to be grouped together in one directory.
+    -b, --balance
+        With this switch, the reviews are balanced with respect to their
+            star number. This means that in every chunk directory, there are
+            chunk-size/5 files of each star number.
+    -s, --star-line
+        The line number of the line containing the stars in the info file.
     -h, --help
         Print this help message.
 EOT
@@ -36,6 +46,8 @@ GetOptions(
     'housing-dir|d=s' => \$housing_dir,
     'without|w=s' => \$without,
     'chunk-size|c=i' => \$chunk_size,
+    'star-line|s=i' => \$star_line,
+    'balance|b' => \$balance,
     'help|h'             => \$help
 ) or die "$Usage";
 
@@ -72,15 +84,29 @@ sub main {
         find_files(\@files, $without_files, $top_dir);
     }
 
+    # Randomize files.
+    my @rand_files = shuffle(@files);
+
     # Dividing the files into chunks.
     my @chunks;
-
-    while (scalar @files > $chunk_size) {
-        my @chunk  = random_sublist(\@files, $chunk_size);
-        push @chunks, \@chunk;
+    if ($balance) {
+        my %star_files = get_star_files(\@rand_files, $star_line);
+        while (@{$star_files{1}}) {
+            my @chunk;
+            for (keys %star_files) {
+                push @chunk, splice(@{$star_files{$_}}, 0, $chunk_size/5);
+            }
+            push @chunks, \@chunk;
+        }
     }
-    push @chunks, \@files;
+    else {
+        while (@rand_files) {
+            my @chunk = splice(@rand_files, 0, $chunk_size);
+            push @chunks, \@chunk;
+        }
+    }
 
+    #print "Chunks: ", join("\n", @chunks), "\n";
     mkdir $out_dir unless -d $out_dir;
     # Create symlinks.
     for (my $i = 0; $i < scalar @chunks; ++$i) {
@@ -106,12 +132,74 @@ sub random_sublist {
     my $list = shift;
     my $size = shift;
 
-    if (scalar $list <= $size) {
-        return $list 
+    if ((scalar @$list) <= $size) {
+        return @$list;
     }
     else {
         my @range = reverse (@$list - $size .. @$list-1);
         return map {splice @$list, rand($_), 1} @range;
+    }
+}
+
+sub get_star_files {
+    my $files = shift;
+    my $info_line = shift;
+    my $total = scalar @$files;
+
+    # Hash mapping star number to their frequencies.
+    my %stars = (
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0
+    );
+
+    # Build hash mapping star number to the respective files.
+    my @files1;
+    my @files2;
+    my @files3;
+    my @files4;
+    my @files5;
+    my %star_files = (
+        1 => \@files1,
+        2 => \@files2,
+        3 => \@files3,
+        4 => \@files4,
+        5 => \@files5
+    );
+    # Fill the hash.
+    for my $f (@$files) {
+        open my $fh, '<', "$f/info";
+        my @lines = map {chomp; $_} <$fh>;
+        close $fh;
+        my $star_number = int($lines[$info_line-1]) or
+            print "Error in star conversion in review $f ($!)";
+        ++$stars{$star_number};
+        push @{$star_files{$star_number}}, $f;
+    }
+
+    if ( my @invalid = grep {my $key = $_; not grep {$_ == $key} (1,2,3,4,5)}
+        keys %stars ) {
+        die "Invalid keys in star hash (@invalid)";
+    }
+
+    my $min_stars = $stars{1};
+    $min_stars = $stars{$_} < $min_stars ? $stars{$_} : $min_stars for keys %stars;
+
+    # Cut the lists to the same size.
+    while (my ($star_num, $file_list) = each %star_files) {
+        my $len = scalar @$file_list;
+        splice(@$file_list, $min_stars - 1, $len - $min_stars);
+    }
+
+    return %star_files;
+}
+
+sub printHash {
+    my $h = shift;
+    for (keys %$h) {
+        print "$_: $h->{$_}\n";
     }
 }
 
