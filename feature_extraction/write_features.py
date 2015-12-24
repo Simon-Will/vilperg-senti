@@ -19,7 +19,7 @@ FEATURE_GETTER_DICT = {
         'keyword_sentiment' : 'fg.Keyword_feature_getter()'
         }
 
-def get_files(dir_name, f_name):
+def get_files(dir_name, f_name, symlinks=False):
     """Recursively get regular files called f_name in the directory dir_name.
 
     Args:
@@ -30,7 +30,7 @@ def get_files(dir_name, f_name):
         files (list): A list of strings containing the full paths to the files.
     """
     files = [os.path.join(root, name)
-            for root, dirs, files in os.walk(dir_name)
+            for root, dirs, files in os.walk(dir_name, followlinks=symlinks)
             for name in files
             if name == f_name]
     return files
@@ -181,6 +181,11 @@ def main():
             choices=['overwrite', 'update', 'append'], default='append',
             help='Decide what to do if the file out_file_name already exists.')
 
+    parser.add_argument('--follow_links', '-f',
+            action='store_true', default=False,
+            help='''Enables following symbolic links. when looking for
+            in_file_name''')
+
     parser.add_argument('--sentiws_file', '-s', help='''The SentiWS file that
             is used for the sentiment features.''')
 
@@ -197,6 +202,7 @@ def main():
     features = args.feature
     if_exists = args.if_exists
     sentiws_file = args.sentiws_file
+    follow_links = args.follow_links
 
     if in_file == out_file:
         sys.stderr.write(
@@ -210,7 +216,7 @@ def main():
             sys.exit(2)
 
     senti_dict = SentiWS_handler.get_senti_dict(sentiws_file)
-    reviews = get_files(top_dir, in_file)
+    reviews = get_files(top_dir, in_file, symlinks=follow_links)
     feature_getters = make_feature_getters(features, senti_dict)
     write_all_review_features(feature_getters, reviews, out_file, if_exists)
 

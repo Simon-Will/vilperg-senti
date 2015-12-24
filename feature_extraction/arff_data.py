@@ -1,9 +1,7 @@
-
-      
 import sys
 import os
 
-def get_files(dir_name, f_name):
+def get_files(dir_name, f_name, symlinks=False):
     """Recursively get regular files called f_name in the directory dir_name.
     Args:
         dir_name (str): The name of a directory.
@@ -12,7 +10,7 @@ def get_files(dir_name, f_name):
         files (list): A list of strings containing the full paths to the files.
     """
     files = [os.path.join(root, name)
-            for root, dirs, files in os.walk(dir_name)
+            for root, dirs, files in os.walk(dir_name, followlinks=symlinks)
             for name in files
             if name == f_name]
     return files 
@@ -22,7 +20,7 @@ output_file = sys.argv[2]
 header_names = sys.argv[3:]
 
    
-data = get_files(dir_name, 'features')
+data = get_files(dir_name, 'features', symlinks=True)
 arff_data = []
 
 for feature_file in data:
@@ -42,9 +40,3 @@ with open(output_file, 'w') as f:
   #write data to arff file
   for d in arff_data:
     f.write("@data {0}\n".format(d[1]))
-  
-
-  
-  
-    
-    
