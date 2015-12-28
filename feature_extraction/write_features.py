@@ -5,6 +5,7 @@ import os
 import sys
 import re
 import argparse
+import datetime
 
 import feature_getter as fg
 import SentiWS_handler
@@ -48,7 +49,17 @@ def read_review(in_file):
     review = []
     for line in open(in_file):
         parts = [part.strip() for part in line.split('\t')]
-        review.append(parts)
+        if len(parts) == 3:
+            review.append(parts)
+        elif LOG_FILE:
+            # Log info about peculiar file.
+            with open(LOG_FILE, 'a') as log:
+                now = datetime.datetime.now()
+                now_formatted = now.strftime('(%Y-%m-%d %H:%M:%S)')
+                log_line = ( '{0} File: "{1}" Not 3 tab-separated parts: {2}'
+                        .format(now_formatted, in_file, line) )
+                log.write(log_line)
+
     return review
 
 def get_review_features(feature_getters, review):
@@ -181,13 +192,16 @@ def main():
             choices=['overwrite', 'update', 'append'], default='append',
             help='Decide what to do if the file out_file_name already exists.')
 
-    parser.add_argument('--follow_links', '-l',
+    parser.add_argument('--follow_links',
             action='store_true', default=False,
             help='''Enables following symbolic links. when looking for
             in_file_name''')
 
     parser.add_argument('--sentiws_file', '-s', help='''The SentiWS file that
             is used for the sentiment features.''')
+
+    parser.add_argument('--log_file', '-l', help='''The file that logs are
+            appended to. Without this option, nothing is logged.''')
 
     parser.add_argument('top_dir',
             help='''The directory that is searched recursively for files called
@@ -203,6 +217,8 @@ def main():
     if_exists = args.if_exists
     sentiws_file = args.sentiws_file
     follow_links = args.follow_links
+    global LOG_FILE
+    LOG_FILE = args.log_file
 
     if in_file == out_file:
         sys.stderr.write(

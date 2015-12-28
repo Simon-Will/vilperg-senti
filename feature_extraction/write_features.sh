@@ -23,6 +23,7 @@ fi
 MODE=$1
 SENTIWS_FILE=$2
 shift 2
+LOG_FILE="features_$(date +%F)"
 
 WRITE_FEATURES="/home/students/will/semipublic/mlt/vilperg-senti/\
 feature_extraction/write_features.py"
@@ -31,8 +32,9 @@ for TOP_DIR in "$@"
 do
 	CMD="$WRITE_FEATURES\
 		--if_exists $MODE\
-		--sentiws_file $SENTIWS_FILE\
 		--follow_links\
+		--sentiws_file $SENTIWS_FILE\
+		--log_file $LOG_FILE\
 		--in_file_name content_tagged\
 		--out_file_name features\
 		--feature token_number\
