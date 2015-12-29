@@ -39,5 +39,10 @@ with open(output_file, 'w') as f:
   for a in arff_data:
     f.write("@attribute {0} {1}\n".format(a[0],a[2]))
   #write data to arff file
+  data_list = []
+  f.write("@data\n")
   for d in arff_data:
-    f.write("@data {0}\n".format(d[1]))
+    data_list.append(d[1])
+  data_line = ','.join(data_list)
+  f.write(data_line)  
+
