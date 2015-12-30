@@ -1,0 +1,11 @@
+@relation Review_sentiment
+
+% stars muss am Ende stehen.
+@attribute adjective_sentiment numeric
+@attribute token_number numeric
+@attribute stars {1, 2, 3, 4, 5}
+
+@data
+47.92, 82, 5
+-143.98, 542, 3
+-2.28, 11, 1
