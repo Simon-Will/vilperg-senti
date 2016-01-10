@@ -15,6 +15,7 @@ do
 		$MLT/all_${c}_12_11_2015\
 		$MLT/chunks/cleansed_balanced_chunks_${c}"
 	
+	#echo $CMD
 	$CMD &
 done
 wait

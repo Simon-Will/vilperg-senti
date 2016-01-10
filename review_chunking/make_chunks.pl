@@ -124,8 +124,9 @@ sub find_files {
     my $files = shift;
     my $without_files = shift;
     my $top_dir = shift;
+    # top_dir shuould be an absoulute path
     opendir(my $dh, $top_dir);
-    push @$files, map {"$top_dir/$_"} (grep { my $f = File::Spec->rel2abs($_); not ($_ =~ /^\.{1,2}$/ or $without_files->has($f)) } readdir $dh);
+    push @$files, map {"$top_dir/$_"} (grep { my $f = "$top_dir/$_"; print "$f\n"; not ($_ =~ /^\.{1,2}$/ or $without_files->has($f)) } readdir $dh);
 }
 
 sub random_sublist {
