@@ -1,10 +1,13 @@
 #!/bin/sh
 
-USAGE="Usage: $0 FILE
+USAGE="Usage: $0 FILE [DELETE_OLD_NORMALIZATIONS]
 Add normalized sentiment features to a file by reading the current sentiment
-features and dividing them by the token_number."
+features and dividing them by the token_number.
+If DELETE_OLD_NORMALIZATIONS is 'delete', normalized sentiments already in the
+file are deleted before calculating the new ones."
 
 FILE=$1
+DELETE_OLD_NORMALIZATIONS=$2
 
 # Handle the user input.
 if [ "$1" = '-h' ]
@@ -28,6 +31,13 @@ then
     echo "Invalid token number: '$TOKEN_NUMBER' in file '$FILE'" >&2 && exit 4
 fi
 
+# If lines already exist, delete them (unless the options is not set).
+if [ "$DELETE_OLD_NORMALIZATIONS" = 'delete' ]
+then
+    sed -i '/^normalized/ d' "$FILE"
+fi
+
+INCREASING_FACTOR=1000000
 # This awk program will calculate the normalized sentiments and include
 # a line for them.
 AWK_PROG='
@@ -40,7 +50,7 @@ BEGIN {
         print $0
     }
     else if ($0 ~ /^[^\s]+_sentiment\t/) {
-        NORMALIZED=$2/TOKEN_NUMBER
+        NORMALIZED=$2/TOKEN_NUMBER*INCREASING_FACTOR
         print $0 ORS "normalized_" $1, NORMALIZED, $3
     }
     else {
@@ -54,5 +64,7 @@ TMP="$HOME/tmp/`readlink -f "$FILE" | sed 's;/;;g'`"
 
 # Execute the program, delete duplicate lines
 # and replace the old file with the new one.
-awk -v TOKEN_NUMBER="$TOKEN_NUMBER" "$AWK_PROG" "$FILE" | sort | uniq > $TMP
+awk -v TOKEN_NUMBER="$TOKEN_NUMBER" -v INCREASING_FACTOR=$INCREASING_FACTOR \
+    "$AWK_PROG" "$FILE" | sort | uniq > $TMP
+
 mv "$TMP" "$FILE"
