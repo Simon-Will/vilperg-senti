@@ -84,8 +84,16 @@ sub main {
         find_files(\@files, $without_files, $top_dir);
     }
 
-    # Randomize files.
+    #while (defined(my $e = $without_files->each)) {
+    #    print "$e\n";
+    #}
+    #print "================================================\n";
+    #print join("\n", @files), "\n";
+    #print "================================================\n";
+
+    ## Randomize files.
     my @rand_files = shuffle(@files);
+    #print join("\n", @rand_files), "\n";
 
     # Dividing the files into chunks.
     my @chunks;
@@ -124,9 +132,11 @@ sub find_files {
     my $files = shift;
     my $without_files = shift;
     my $top_dir = shift;
-    # top_dir shuould be an absoulute path
+    # top_dir shuould be an absolute path
     opendir(my $dh, $top_dir);
-    push @$files, map {"$top_dir/$_"} (grep { my $f = "$top_dir/$_"; print "$f\n"; not ($_ =~ /^\.{1,2}$/ or $without_files->has($f)) } readdir $dh);
+    my @filtered_relative_paths = grep { my $f = "$top_dir/$_"; not ($_ =~ /^\.{1,2}$/ or $without_files->has($f)) } readdir $dh;
+    #print "$top_dir/$_\n" for @filtered_relative_paths;
+    push @$files, map {"$top_dir/$_"} @filtered_relative_paths;
 }
 
 sub random_sublist {
