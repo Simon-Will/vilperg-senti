@@ -37,9 +37,9 @@ for feature_file in data:
 
 
 #attribute dictionary
-d = {'token_number':'numeric', 'type_number':'numeric', 'overall_sentiment':'numeric',
-        'adjective_sentiment':'numeric', 'verb_sentiment':'numeric',
-        'noun_sentiment':'numeric','keyword_sentiment':'numeric','stars':'{1,2,3,4,5}'}
+d = {'token_number':'numeric', 'normalised_overall_sentiment':'numeric',
+        'normalised_adjective_sentiment':'numeric', 'normalised_verb_sentiment':'numeric',
+        'normalised_noun_sentiment':'numeric', 'binary_judgement':'{good, bad}', 'stars':'{1,2,3,4,5}'}
         
 with open(output_file, 'w') as f:
   #write relation to arff file
