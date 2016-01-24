@@ -1,0 +1,88 @@
+=== Run information ===
+
+Scheme:weka.classifiers.bayes.NaiveBayes 
+Relation:     Review_sentiment
+Instances:    17855
+Attributes:   6
+              token_number
+              overall_sentiment
+              adjective_sentiment
+              noun_sentiment
+              verb_sentiment
+              stars
+Test mode:10-fold cross-validation
+
+=== Classifier model (full training set) ===
+
+Naive Bayes Classifier
+
+                        Class
+Attribute                   1       2       3       4       5
+                        (0.2)   (0.2)   (0.2)   (0.2)   (0.2)
+==============================================================
+token_number
+  mean                   83.92 96.2846 90.5199 83.5964 63.1245
+  std. dev.            94.2046 101.062107.8807100.4092 73.1028
+  weight sum              3571    3571    3571    3571    3571
+  precision             3.4396  3.4396  3.4396  3.4396  3.4396
+
+overall_sentiment
+  mean                 -0.2391 -0.0621  0.1228  0.4551  0.6435
+  std. dev.             0.7764  0.8216  0.8464  0.8091   0.753
+  weight sum              3571    3571    3571    3571    3571
+  precision             0.0015  0.0015  0.0015  0.0015  0.0015
+
+adjective_sentiment
+  mean                 -0.0125  0.1391  0.2881  0.5336    0.61
+  std. dev.             0.6004  0.6999   0.731  0.7362  0.6829
+  weight sum              3571    3571    3571    3571    3571
+  precision             0.0012  0.0012  0.0012  0.0012  0.0012
+
+noun_sentiment
+  mean                 -0.1193 -0.0851 -0.0734 -0.0585 -0.0234
+  std. dev.             0.3634   0.302  0.2734  0.2699  0.2156
+  weight sum              3571    3571    3571    3571    3571
+  precision             0.0047  0.0047  0.0047  0.0047  0.0047
+
+verb_sentiment
+  mean                 -0.0207 -0.0134  -0.011  0.0149   0.059
+  std. dev.             0.2161  0.2219  0.2266  0.2102  0.2066
+  weight sum              3571    3571    3571    3571    3571
+  precision             0.0023  0.0023  0.0023  0.0023  0.0023
+
+
+
+Time taken to build model: 0.03 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances        5339               29.902  %
+Incorrectly Classified Instances     12516               70.098  %
+Kappa statistic                          0.1238
+Mean absolute error                      0.2991
+Root mean squared error                  0.3969
+Relative absolute error                 93.4733 %
+Root relative squared error             99.2362 %
+Total Number of Instances            17855     
+
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 0.507     0.261      0.326     0.507     0.397      0.696    1
+                 0.052     0.033      0.283     0.052     0.088      0.62     2
+                 0.048     0.033      0.267     0.048     0.082      0.54     3
+                 0.082     0.049      0.294     0.082     0.128      0.617    4
+                 0.806     0.499      0.287     0.806     0.424      0.722    5
+Weighted Avg.    0.299     0.175      0.292     0.299     0.224      0.639
+
+=== Confusion Matrix ===
+
+    a    b    c    d    e   <-- classified as
+ 1810  185   98  102 1376 |    a = 1
+ 1534  187  159  183 1508 |    b = 2
+ 1138  161  173  205 1894 |    c = 3
+  686   83  154  292 2356 |    d = 4
+  376   44   64  210 2877 |    e = 5
+
+
