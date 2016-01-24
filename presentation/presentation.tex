@@ -1,0 +1,93 @@
+\documentclass[note=hide]{beamer} %für die Präsentation
+%\documentclass[note=hide,handout]{beamer} %zum Drucken
+
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\usetheme{heidelberg}
+%\usetheme{Malmoe}
+%\usecolortheme{seahorse}
+%\useoutertheme{smoothbars}
+
+\usepackage{floatflt}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{color}
+
+\usepackage{verbatim}
+\usepackage{moreverb}
+\usepackage{alltt}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{rotating}
+\usepackage{fixltx2e}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,shapes,arrows}
+% color definitions
+\definecolor{dunkelrot}{RGB}{139, 0, 0} 
+\definecolor{dunkelgruen}{RGB}{0,100,0}
+
+\usepackage{listings} %für Code-Fragmente
+\lstset{
+   basicstyle=\ttfamily\scriptsize\mdseries,
+   keywordstyle=\bfseries\color[rgb]{0,0,1},
+   identifierstyle=,
+   commentstyle=\color[rgb]{0,0.58,0},  
+   stringstyle=\itshape\color[rgb]{0.65,0.16,0},
+   numbers=left,
+   numberstyle=\tiny,
+   stepnumber=1,
+   breaklines=true,
+   frame=none,
+   showstringspaces=false,
+   tabsize=4,
+   backgroundcolor=\color[rgb]{0.9,0.9,0.9},
+   captionpos=b,
+   float=htbp,
+   language=Matlab,
+   xleftmargin=15pt,
+   xrightmargin=15pt
+} 
+%Beispiele
+%-> \begin{lstlisting}[language=JAVA,firstnumber=27] ... \end{lstlisting}
+%-> \lstinline[language=JAVA]{...}
+%-> for beamer, embed it in a fragile frame!: \begin{frame}[fragile]{Beispiel} ... \end{frame}
+
+\title[vilperg-senti]{Sentimenterkennung auf Amazon-Reviews} %Einen Kürzel für das Referatsthema angeben (erscheint im zweiten Feld der Fußzeile).
+%\subtitle{<Referatstitel> \\ -- Referat -- } %Titel des Referats angeben
+\author[berg, will]{Caroline Berg \\ Simon Will} %Namen bitte in alphabetischer Reihenfolge angeben. Namenkürzel zusätzlich angeben (erscheint im dritten Feld der Fußzeile).
+\institute[]{Institut für Computerlinguistik 
+	\\ Ruprecht-Karls-Universität Heidelberg
+	\\ Dozentin: Éva Mújdricza-Maydt
+	\\ WS 2015/2016}
+\date{3. Februar 2016} %oder ein vorgegebenes Datum; soll nicht zu lang sein, weil das Datum auch in das linke Feld der Fußzeile passen soll.
+
+\begin{document}
+
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\begin {frame}
+	\tableofcontents
+\end{frame}
+
+
+\section{Erste Section}
+
+\begin{frame}{Erster Frame} % text aligned in the middle
+	\begin{itemize}
+		\item first
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Zweiter Frame} %text always begins on top
+	\begin{itemize}
+		\item first
+	\end{itemize}
+\end{frame}
+
+\end{document}
