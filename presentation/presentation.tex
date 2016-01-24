@@ -56,7 +56,15 @@
 %-> \lstinline[language=JAVA]{...}
 %-> for beamer, embed it in a fragile frame!: \begin{frame}[fragile]{Beispiel} ... \end{frame}
 
-\title[vilperg-senti]{Sentimenterkennung auf Amazon-Reviews} %Einen Kürzel für das Referatsthema angeben (erscheint im zweiten Feld der Fußzeile).
+\usepackage{siunitx}
+
+\newcommand{\pymodule}[1]{\texttt{#1}}
+\newcommand{\proglang}[1]{\texttt{#1}}
+\newcommand{\feature}[1]{\emph{#1}}
+\newcommand{\ellipse}{[\ldots]}
+\newcommand{\checkthis}[1]{#1}
+
+\title[vilperg-senti]{Sentimentanalyse auf Amazon-Reviews} %Einen Kürzel für das Referatsthema angeben (erscheint im zweiten Feld der Fußzeile).
 %\subtitle{<Referatstitel> \\ -- Referat -- } %Titel des Referats angeben
 \author[berg, will]{Caroline Berg \\ Simon Will} %Namen bitte in alphabetischer Reihenfolge angeben. Namenkürzel zusätzlich angeben (erscheint im dritten Feld der Fußzeile).
 \institute[]{Institut für Computerlinguistik 
@@ -71,23 +79,145 @@
 	\titlepage
 \end{frame}
 
-\begin {frame}
+\begin{frame}
 	\tableofcontents
 \end{frame}
 
 
-\section{Erste Section}
+\section{Überblick}
 
-\begin{frame}{Erster Frame} % text aligned in the middle
+\begin{frame}{Einführung} % text aligned in the middle
 	\begin{itemize}
-		\item first
+		\item Unser Projekt: Sentimentanalyse auf Amazon-Reviews\\[0.3cm]
+			\includegraphics[width=\textwidth]{amazon_review_galaxy.png}
+		\item Ziel: Anzahl der für ein Produkt vergebenen Sterne (1--5) aus dem Reviewtext vorhersagen
+		\item Für einen Teil der Auswertuung wurden die fünf Klassen binarisiert zu \emph{gut} und \emph{schlecht}.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[t]{Zweiter Frame} %text always begins on top
+\begin{frame}[t]{Vergleichbare Projekte} %text always begins on top
 	\begin{itemize}
-		\item first
+		\item Callen Rain: Sentiment Analyses in Amazon Reviews. Using Probabilistic Machine Learning.
 	\end{itemize}
+\end{frame}
+
+\section{Projektablauf}
+
+\begin{frame}{Flussdiagramm}
+
+\end{frame}
+
+\begin{frame}{Amazon Scraper}
+	\begin{itemize}
+		\item geschrieben in \proglang{python3} mit \pymodule{urllib2}, \pymodule{BeautifulSoup} und \pymodule{lxml}
+		\item ruft eine Überblicksseite auf Amazon auf, auf der Projekte aufgelistet sind und lädt alle Reviews herunter.\\[0.3cm]
+			\includegraphics[height=0.6\textheight]{amazon_overview_smartphones.png}
+		\item ruft dann die nächste Überblicksseite auf usw.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Vorverarbeitung}
+	\begin{itemize}
+		\item Mit dem TreeTagger und den mit ihm gelieferten Skripten wurden die Reviews
+			\begin{itemize}
+				\item tokenisiert,
+				\item mit POS-Tags versehen und
+				\item lemmatisiert. \\[0.3cm]
+			\end{itemize}
+			\includegraphics[width=0.8\textwidth]{content_tagged_example_black.png}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Einteilung in Chunks}
+
+\end{frame}
+
+\begin{frame}{Ressource: SentiWS}
+	\begin{itemize}
+		\item \emph{SentiWS} (kurz für ,,Sentimentwortschatz``) ist eine Datenbank, die deutschen Wörtern Zahlen von $-1$ bis $1$ zuordnet, die das \checkthis{Sentiment} der Wörter darstellen soll.
+		\item Enthalten sind etwa $33000$ Wortformen zu etwa $3500$ Lemmata.
+	\end{itemize}
+	\includegraphics[width=\textwidth]{sentiws_example_black.png}
+\end{frame}
+
+\begin{frame}{Feature-Extraktion}
+	\begin{itemize}
+		\item geschrieben in \proglang{python3} (und \proglang{sh}, \proglang{bash} und \proglang{awk})
+		\item Attribute: \feature{token\_number}, \feature{overall\_sentiment}, \feature{adjective\_sentiment}, \feature{noun\_sentiment}, \feature{verb\_sentiment}
+		\item Die Sentiment-Attribute existieren auch in einer auf die \feature{token\_number} normierten Version.
+			\footnote{$\text{normalized\_overall\_sentiment} = \frac{\text{overall\_sentiment} * 10^6}{\text{token\_number}}$}
+		\item Klassenattribute: \feature{stars} und \feature{binary\_judgement}
+	\end{itemize}
+	\includegraphics[width=\textwidth]{features_example_black.png}
+\end{frame}
+
+\begin{frame}{ARFF-Datei}
+	\includegraphics[width=\textwidth]{arff_example_black.png}
+\end{frame}
+
+\section{Evaluation und Experimente}
+
+\begin{frame}{Benutzte Klassifizierer}
+	\begin{itemize}
+		\item J48 mit 
+			\begin{description}
+				\item[-U] ,,Use unpruned tree``
+			\end{description}
+		\item RandomForest mit 
+			\begin{description}
+				\item[-I 10] ,,Number of trees to build``
+				\item[-K 0] ,,Number of features to consider``
+				\item[-S 1] ,,Seed for random number generator``
+				\item[-depth 200] ,,The maximum depth of the trees``
+			\end{description}
+		\item NaiveBayes ohne Optionen
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Normierte Attribute}
+
+	Mit Kreuzvalidierung ergeben sich folgende Ergebnisse:
+
+	\begin{tabular}{lcccc}
+		\small
+		Klassen & Majority Voting & J48 & RandomForest & Naïve Bayes \\
+		1--5 Sterne & \SI{20}{\%} &\SI{61.0}{\%} & \textbf{\SI{67.6}{\%}} & \SI{32.5}{\%} \\
+		gut -- schlecht & \SI{60}{\%} & \SI{75.0}{\%} & \SI{84.6}{\%} & \SI{69.8}{\%} \\
+	\end{tabular}
+
+	Wird ein Teil der Daten eigens zum Testen abgetrennt, verringert sich die Accuracy etwas (von \SI{67.6}{\%} beim RandomForest auf \SI{64.7}{\%}).
+	Das liegt wohl einfach daran, dass dann auf weniger Daten trainiert wird.
+	
+\end{frame}
+
+\begin{frame}{Variieren der Trainingsdatenmenge}
+	\includegraphics[width=\framewidth]{accuracy_smartphones_normalized_trainsize.png}
+\end{frame}
+
+\begin{frame}{Attributselektion}
+	\includegraphics[width=\framewidth]{accuracy_smartphones_normalized.png}
+\end{frame}
+
+\begin{frame}{Test auf fremder Domäne}
+	Das mit einem RandomForest auf den normierten Sentimentattributen und \feature{token\_number} trainierte Modell für Smartphones wurde auf Armbanduhren getestet, doch es wurde nur eine Accuracy von \SI{27.7}{\%} erreicht.
+\end{frame}
+
+\begin{frame}{Fehlersuche}
+	\begin{block}{Review mit 5 Sternen}
+		Super Handy, Habe mir dieses Handy bestellt, weil wir schon das gleiche in der Familie haben.Einfache Bedienung, tolle Menüführung. Einfach Klasse für einen guten Preis.
+	\end{block}
+\end{frame}
+
+\begin{frame}{title}
+	\begin{block}{Review mit 5 Sternen}
+	Ich persönlich komme vom Nokia E51 :) und habe über nun fast ein halbes Jahr verschiedene Smartphones \ellipse\ begutachtet.Ebenfalls im Focus hatte ich (Nachteile ggü. dem S3 hier aufgeführt):Motorola RAZR MAXX: kein Wechselakku, Andoid 4.1 ungewißHTC One X: kein Wechselakku, kein Glonass, kein SD-SchachtSamsung Galaxy Note: schlechtere Performance, Andoid 4.1 ungewißSamsung Galaxy Ace 2: schlechtere Performance, wenig Flashspeicher, Andoid 4.1 ungewißMeine Eindrücke \ellipse\ des S3 kurz zusammengefasst:positiv:- Display: hohe Auflösung, schöne Farben, die Größe möchte ich wirklich nicht mehr missen \ellipse
+	\end{block}
+\end{frame}
+
+\begin{frame}{Fazit}
+	Unsere Ergebnisse sind für unseren naiven Ansatz überraschend gut.
+	Um die Accuracy zu verbessern, müssten noch weitere Information über den Kontext und Textstruktur sowie über Negationen einbeziehen.
+	Die Aufgabe wird für ausgefeiltere Herangehensweise dadurch erschwert, dass die Texte nicht standardisiert sind.
 \end{frame}
 
 \end{document}
