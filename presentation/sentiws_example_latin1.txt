@@ -1,0 +1,9 @@
+Zusammengehörigkeit|NN	0.0040
+Zusammenhalt|NN	0.1947	Zusammenhaltes,Zusammenhalte,Zusammenhalts,Zusammenhalten
+Zuschuß|NN	0.0040	Zuschüße,Zuschußes,Zuschüßen,Zuschußs
+Zustimmung|NN	0.0040	Zustimmungen
+Zuverlässigkeit|NN	0.0040
+Zuversicht|NN	0.0727
+abgesichert|ADJX	0.0040
+abmachen|VVINF	0.0040	abgemacht,abmachst,abmach,abmachet,abmachten,abmacht,abmache,abmachtest,abmachte,abmachest,abmachtet
+abschließen|VVINF	0.0040

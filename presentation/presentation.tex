@@ -2,7 +2,7 @@
 %\documentclass[note=hide,handout]{beamer} %zum Drucken
 
 \usepackage[ngerman]{babel}
-\usepackage[utf8]{inputenc}
+\usepackage[latin1,utf8]{inputenx}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
@@ -16,16 +16,16 @@
 \usepackage{hyperref}
 \usepackage{color}
 
-\usepackage{verbatim}
-\usepackage{moreverb}
-\usepackage{alltt}
+%\usepackage{verbatim}
+%\usepackage{moreverb}
+%\usepackage{alltt}
 
-\usepackage{comment}
+%\usepackage{comment}
 \usepackage{booktabs}
-\usepackage{rotating}
-\usepackage{fixltx2e}
-\usepackage{tikz}
-\usetikzlibrary{positioning,shadows,shapes,arrows}
+%\usepackage{rotating}
+%\usepackage{fixltx2e}
+%\usepackage{tikz}
+%\usetikzlibrary{positioning,shadows,shapes,arrows}
 % color definitions
 \definecolor{dunkelrot}{RGB}{139, 0, 0} 
 \definecolor{dunkelgruen}{RGB}{0,100,0}
@@ -56,7 +56,13 @@
 %-> \lstinline[language=JAVA]{...}
 %-> for beamer, embed it in a fragile frame!: \begin{frame}[fragile]{Beispiel} ... \end{frame}
 
+%%%%%%%%% Our additions %%%%%%%%%%
+
 \usepackage{siunitx}
+\usepackage{adjustbox}
+
+\definecolor{unirot}{rgb}{0.5976525,0,0}
+\setbeamercolor{alerted text}{fg=unirot}
 
 \newcommand{\pymodule}[1]{\texttt{#1}}
 \newcommand{\proglang}[1]{\texttt{#1}}
@@ -64,14 +70,14 @@
 \newcommand{\ellipse}{[\ldots]}
 \newcommand{\checkthis}[1]{#1}
 
-\title[vilperg-senti]{Sentimentanalyse auf Amazon-Reviews} %Einen Kürzel für das Referatsthema angeben (erscheint im zweiten Feld der Fußzeile).
-%\subtitle{<Referatstitel> \\ -- Referat -- } %Titel des Referats angeben
-\author[berg, will]{Caroline Berg \\ Simon Will} %Namen bitte in alphabetischer Reihenfolge angeben. Namenkürzel zusätzlich angeben (erscheint im dritten Feld der Fußzeile).
+\title[vilperg-senti]{Sentimentanalyse auf Amazon-Reviews}
+%\subtitle{<Referatstitel> \\ -- Referat -- }
+\author[berg, will]{Caroline Berg \\ Simon Will}
 \institute[]{Institut für Computerlinguistik 
 	\\ Ruprecht-Karls-Universität Heidelberg
 	\\ Dozentin: Éva Mújdricza-Maydt
 	\\ WS 2015/2016}
-\date{3. Februar 2016} %oder ein vorgegebenes Datum; soll nicht zu lang sein, weil das Datum auch in das linke Feld der Fußzeile passen soll.
+\date{3. Februar 2016}
 
 \begin{document}
 
@@ -116,7 +122,7 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Vorverarbeitung}
+\begin{frame}[fragile]{Vorverarbeitung}
 	\begin{itemize}
 		\item Mit dem TreeTagger und den mit ihm gelieferten Skripten wurden die Reviews
 			\begin{itemize}
@@ -124,8 +130,9 @@
 				\item mit POS-Tags versehen und
 				\item lemmatisiert. \\[0.3cm]
 			\end{itemize}
-			\includegraphics[width=0.8\textwidth]{content_tagged_example_black.png}
 	\end{itemize}
+	%\includegraphics[width=0.8\textwidth]{content_tagged_example_black.png}
+	\lstinputlisting[lastline=15]{content_tagged_example.txt}
 \end{frame}
 
 \begin{frame}{Einteilung in Chunks}
@@ -137,7 +144,14 @@
 		\item \emph{SentiWS} (kurz für ,,Sentimentwortschatz``) ist eine Datenbank, die deutschen Wörtern Zahlen von $-1$ bis $1$ zuordnet, die das \checkthis{Sentiment} der Wörter darstellen soll.
 		\item Enthalten sind etwa $33000$ Wortformen zu etwa $3500$ Lemmata.
 	\end{itemize}
-	\includegraphics[width=\textwidth]{sentiws_example_black.png}
+	%\includegraphics[width=\textwidth]{sentiws_example_black.png}
+	{
+		% lstinputlisting kommt nicht mit Zeichen klar, die durch mehr als ein Byte kodiert sind.
+		% Daher wird der Text im Encoding ISO-8859-1 gespeichert.
+		% Allerdings muss dafür in LaTeX das InputEncoding geändert werden.
+		\InputEncoding{latin1}
+		\lstinputlisting{sentiws_example_latin1.txt}
+	}
 \end{frame}
 
 \begin{frame}{Feature-Extraktion}
@@ -148,11 +162,13 @@
 			\footnote{$\text{normalized\_overall\_sentiment} = \frac{\text{overall\_sentiment} * 10^6}{\text{token\_number}}$}
 		\item Klassenattribute: \feature{stars} und \feature{binary\_judgement}
 	\end{itemize}
-	\includegraphics[width=\textwidth]{features_example_black.png}
+	%\includegraphics[width=\textwidth]{features_example_black.png}
+	\lstinputlisting{features_example.txt}
 \end{frame}
 
 \begin{frame}{ARFF-Datei}
-	\includegraphics[width=\textwidth]{arff_example_black.png}
+	%\includegraphics[width=\textwidth]{arff_example_black.png}
+	\lstinputlisting{arff_example.txt}
 \end{frame}
 
 \section{Evaluation und Experimente}
@@ -174,17 +190,22 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Normierte Attribute}
+\begin{frame}{Hauptsächliche Ergebnisse}
 
 	Mit Kreuzvalidierung ergeben sich folgende Ergebnisse:
 
-	\begin{tabular}{lcccc}
-		\small
-		Klassen & Majority Voting & J48 & RandomForest & Naïve Bayes \\
-		1--5 Sterne & \SI{20}{\%} &\SI{61.0}{\%} & \textbf{\SI{67.6}{\%}} & \SI{32.5}{\%} \\
-		gut -- schlecht & \SI{60}{\%} & \SI{75.0}{\%} & \SI{84.6}{\%} & \SI{69.8}{\%} \\
-	\end{tabular}
-
+	\adjustbox{max width=\textwidth,vspace=3ex}
+	{
+		\begin{tabular}{lccccc}
+			\toprule
+			Klassen & normiert & Majority Voting & J48 & RandomForest & Naïve Bayes \\
+			\midrule
+			1--5 & nein & \SI{20}{\%} &\SI{61.0}{\%} & \SI{67.4}{\%} & \SI{31.6}{\%} \\
+			1--5 & ja & \SI{20}{\%} &\SI{61.0}{\%} & \alert{\SI{67.6}{\%}} & \SI{32.5}{\%} \\
+			binär & ja & \SI{60}{\%} & \SI{75.0}{\%} & \SI{84.6}{\%} & \SI{69.8}{\%} \\
+			\bottomrule
+		\end{tabular}
+	}
 	Wird ein Teil der Daten eigens zum Testen abgetrennt, verringert sich die Accuracy etwas (von \SI{67.6}{\%} beim RandomForest auf \SI{64.7}{\%}).
 	Das liegt wohl einfach daran, dass dann auf weniger Daten trainiert wird.
 	
@@ -205,20 +226,22 @@
 
 \begin{frame}{Fehlersuche}
 	\begin{block}{Review mit 5 Sternen}
-		Super Handy, Habe mir dieses Handy bestellt, weil wir schon das gleiche in der Familie haben.Einfache Bedienung, tolle Menüführung. Einfach Klasse für einen guten Preis.
+		\it
+		Super Handy, Habe mir dieses Handy bestellt, weil wir schon das gleiche in der Familie haben. Einfache Bedienung, tolle Menüführung. Einfach Klasse für einen guten Preis.
 	\end{block}
 \end{frame}
 
-\begin{frame}{title}
+\begin{frame}{Fehlersuche}
 	\begin{block}{Review mit 5 Sternen}
-	Ich persönlich komme vom Nokia E51 :) und habe über nun fast ein halbes Jahr verschiedene Smartphones \ellipse\ begutachtet.Ebenfalls im Focus hatte ich (Nachteile ggü. dem S3 hier aufgeführt):Motorola RAZR MAXX: kein Wechselakku, Andoid 4.1 ungewißHTC One X: kein Wechselakku, kein Glonass, kein SD-SchachtSamsung Galaxy Note: schlechtere Performance, Andoid 4.1 ungewißSamsung Galaxy Ace 2: schlechtere Performance, wenig Flashspeicher, Andoid 4.1 ungewißMeine Eindrücke \ellipse\ des S3 kurz zusammengefasst:positiv:- Display: hohe Auflösung, schöne Farben, die Größe möchte ich wirklich nicht mehr missen \ellipse
+		\it
+	Ich persönlich komme vom Nokia E51 :) und habe über nun fast ein halbes Jahr verschiedene Smartphones \ellipse\ begutachtet. Ebenfalls im Focus hatte ich (Nachteile ggü. dem S3 hier aufgeführt): Motorola RAZR MAXX: kein Wechselakku, Andoid 4.1 ungewiß; HTC One X: kein Wechselakku, kein Glonass, kein SD-SchachtSamsung Galaxy Note: schlechtere Performance, Andoid 4.1 ungewiß; Samsung Galaxy Ace 2: schlechtere Performance, wenig Flashspeicher, Andoid 4.1 ungewiß; Meine Eindrücke \ellipse\ des S3 kurz zusammengefasst:positiv:- Display: hohe Auflösung, schöne Farben, die Größe möchte ich wirklich nicht mehr missen \ellipse
 	\end{block}
 \end{frame}
 
 \begin{frame}{Fazit}
 	Unsere Ergebnisse sind für unseren naiven Ansatz überraschend gut.
 	Um die Accuracy zu verbessern, müssten noch weitere Information über den Kontext und Textstruktur sowie über Negationen einbeziehen.
-	Die Aufgabe wird für ausgefeiltere Herangehensweise dadurch erschwert, dass die Texte nicht standardisiert sind.
+	Die Aufgabe wird für eine ausgefeiltere Herangehensweise dadurch erschwert, dass die Texte nicht standardisiert sind.
 \end{frame}
 
 \end{document}

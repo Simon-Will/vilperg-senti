@@ -1,0 +1,11 @@
+adjective_sentiment	0.6574	numeric
+binary_judgement	good	{good, bad}
+normalized_adjective_sentiment	28582.6	numeric
+normalized_noun_sentiment	0	numeric
+normalized_overall_sentiment	28582.6	numeric
+normalized_verb_sentiment	0	numeric
+noun_sentiment	0	numeric
+overall_sentiment	0.6574	numeric
+stars	5	{1, 2, 3, 4, 5}
+token_number	23	numeric
+verb_sentiment	0	numeric
