@@ -101,16 +101,47 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[t]{Vergleichbare Projekte} %text always begins on top
+\begin{frame}{Vergleichbare Projekte} %text always begins on top
 	\begin{itemize}
 		\item Callen Rain: Sentiment Analyses in Amazon Reviews. Using Probabilistic Machine Learning.
+		\item Reviews aus Büchern, Filmen, CDs..
+		\item Klassifizierung:
+		\begin{itemize}
+			\item 1-2 Sterne: score 0
+			\item 5 Sterne: score 1
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Vergleichbare Projekte}
+	\begin{itemize}
+		\item Feature-Extraction
+		\begin{itemize}
+			\item bag of words: 2000 häufigste Wörter in Reviews (0 für ja, 1 für nein)
+			\item collocations: \emph{bigram function} von NLTK (500 häufigste Bigramme, analog zu bag of words)
+			\item negation: nach einer Negation werden die drei darauffolgenden Wörter mit \emph{(NOT)} annotiert
+			\item sentence length: 
+			\begin{itemize}
+				\item sentence feature für kurze Sätze ($<10$)
+				\item sentence feature für lange Sätze ($>20$)
+			\end{itemize}
+			\item Ergebnisse:
+			\begin{itemize}
+				\item Amazon Kindle (Naive Bayes): \SI{84}{\%}
+				\item MacBook (Naive Bayes): \SI{88.2}{\%}
+			\end{itemize}
+			
+		\end{itemize}
+		
 	\end{itemize}
 \end{frame}
 
 \section{Projektablauf}
 
 \begin{frame}{Flussdiagramm}
-
+	\begin{center}
+	\includegraphics[scale=0.287]{flussdiagramm.png}
+	\end{center}
 \end{frame}
 
 \begin{frame}{Amazon Scraper}
