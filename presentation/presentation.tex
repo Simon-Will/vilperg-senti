@@ -64,9 +64,17 @@
 \definecolor{unirot}{rgb}{0.5976525,0,0}
 \setbeamercolor{alerted text}{fg=unirot}
 
+\AtBeginSection[]
+{
+	\begin{frame}
+		\frametitle{Table of Contents}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
 \newcommand{\pymodule}[1]{\texttt{#1}}
 \newcommand{\proglang}[1]{\texttt{#1}}
-\newcommand{\feature}[1]{\emph{#1}}
+\newcommand{\feature}[1]{\textcolor{dunkelrot}{\emph{#1}}}
 \newcommand{\ellipse}{[\ldots]}
 \newcommand{\checkthis}[1]{#1}
 
@@ -103,11 +111,11 @@
 
 \begin{frame}{Vergleichbare Projekte} %text always begins on top
 	\begin{itemize}
-		\item Callen Rain: Sentiment Analyses in Amazon Reviews. Using Probabilistic Machine Learning.
-		\item Reviews aus Büchern, Filmen, CDs..
+		\item Callen \textsc{Rain}: Sentiment Analyses in Amazon Reviews Using Probabilistic Machine Learning.
+		\item Reviews aus Büchern, Filmen, CDs, \ldots
 		\item Klassifizierung:
 		\begin{itemize}
-			\item 1-2 Sterne: score 0
+			\item 1--2 Sterne: score 0
 			\item 5 Sterne: score 1
 		\end{itemize}
 	\end{itemize}
@@ -115,24 +123,23 @@
 
 \begin{frame}{Vergleichbare Projekte}
 	\begin{itemize}
-		\item Feature-Extraction
+		\item Feature-Extraction bei \textsc{Rain}
 		\begin{itemize}
-			\item bag of words: 2000 häufigste Wörter in Reviews (0 für ja, 1 für nein)
-			\item collocations: \emph{bigram function} von NLTK (500 häufigste Bigramme, analog zu bag of words)
-			\item negation: nach einer Negation werden die drei darauffolgenden Wörter mit \emph{(NOT)} annotiert
-			\item sentence length: 
+			%\item \feature{bag of words}: 2000 häufigste Wörter in Reviews (0 für ja, 1 für nein)
+			\item \feature{bag of words}: Vorkommen der 2000 häufigsten Wörter in Reviews (binär)
+			\item \feature{collocations}: \emph{bigram function} von NLTK (500 häufigste Bigramme, analog zu bag of words)
+			\item \feature{negation}: nach einer Negation werden die drei darauffolgenden Wörter mit \emph{(NOT)} annotiert
+			\item \feature{sentence length}: 
 			\begin{itemize}
 				\item sentence feature für kurze Sätze ($<10$)
 				\item sentence feature für lange Sätze ($>20$)
 			\end{itemize}
-			\item Ergebnisse:
+		\item Ergebnisse (Accuracy):
 			\begin{itemize}
 				\item Amazon Kindle (Naive Bayes): \SI{84}{\%}
 				\item MacBook (Naive Bayes): \SI{88.2}{\%}
 			\end{itemize}
-			
 		\end{itemize}
-		
 	\end{itemize}
 \end{frame}
 
@@ -167,7 +174,30 @@
 \end{frame}
 
 \begin{frame}{Einteilung in Chunks}
+	Sternverteilung der Smartphone-Reviews:
+	\begin{center}
+		\renewcommand{\arraystretch}{1.3}
+		\begin{tabular}{l|*{5}{c}|c}
+			Sterne & $1$ & $2$ & $3$ & $4$ & $5$ & Gesamt \\
+			\hline
+			Anzahl & $13231$ & $6645$ & $8794$ & $21826$ & $77310$ & $127806$ \\
+		\end{tabular}
+	\end{center}
+	\vspace{0.3cm}
+	$\Rightarrow$ Eine Ausbalancierung ist nötig.\\[0.3cm]
+	\begin{itemize}
+		\item Erstellung einer Struktur aus symbolischen Links
+		\item Jeder Symlink zeigt zufällig auf ein Review.
+		\item Anordnung der Symlinks in balancierten Verzeichnissen (\emph{Chunks})
+		\item geschrieben in \proglang{perl5}
+		\item noch $33500$ Reviews nach dem Ausbalancieren übrig
+	\end{itemize}
+\end{frame}
 
+\begin{frame}{Einteilung in Chunks}
+	\begin{center}
+		\includegraphics[scale=0.33]{chunks_diagram.png}
+	\end{center}
 \end{frame}
 
 \begin{frame}{Ressource: SentiWS}
@@ -189,8 +219,7 @@
 	\begin{itemize}
 		\item geschrieben in \proglang{python3} (und \proglang{sh}, \proglang{bash} und \proglang{awk})
 		\item Attribute: \feature{token\_number}, \feature{overall\_sentiment}, \feature{adjective\_sentiment}, \feature{noun\_sentiment}, \feature{verb\_sentiment}
-		\item Die Sentiment-Attribute existieren auch in einer auf die \feature{token\_number} normierten Version.
-			\footnote{$\text{normalized\_overall\_sentiment} = \frac{\text{overall\_sentiment} * 10^6}{\text{token\_number}}$}
+		\item Die Sentiment-Attribute existieren auch in einer auf die \feature{token\_number} normierten Version.\footnote{$\text{normalized\_overall\_sentiment} = \frac{\text{overall\_sentiment} * 10^6}{\text{token\_number}}$}
 		\item Klassenattribute: \feature{stars} und \feature{binary\_judgement}
 	\end{itemize}
 	%\includegraphics[width=\textwidth]{features_example_black.png}
@@ -223,13 +252,13 @@
 
 \begin{frame}{Hauptsächliche Ergebnisse}
 
-	Mit Kreuzvalidierung ergeben sich folgende Ergebnisse:
+	Mit zehnfacher Kreuzvalidierung ergeben sich folgende Ergebnisse:
 
 	\adjustbox{max width=\textwidth,vspace=3ex}
 	{
 		\begin{tabular}{lccccc}
 			\toprule
-			Klassen & normiert & Majority Voting & J48 & RandomForest & Naïve Bayes \\
+			Klassen & normiert & Majority Voting & J48 & RandomForest & Naive Bayes \\
 			\midrule
 			1--5 & nein & \SI{20}{\%} &\SI{61.0}{\%} & \SI{67.4}{\%} & \SI{31.6}{\%} \\
 			1--5 & ja & \SI{20}{\%} &\SI{61.0}{\%} & \alert{\SI{67.6}{\%}} & \SI{32.5}{\%} \\
@@ -251,8 +280,12 @@
 \end{frame}
 
 \begin{frame}{Test auf fremder Domäne}
-	Das mit einem RandomForest auf den normierten Sentimentattributen und \feature{token\_number} trainierte Modell für Smartphones wurde auf Armbanduhren getestet, doch es wurde nur eine Accuracy von \SI{27.7}{\%} erreicht.
-	Dazu beitragen könnte, dass die Reviewtexte der Armbanduhren im Schnitt nur etwa ein Drittel so lang sind wie die der Smartphones.
+
+	\begin{itemize}
+		\item Test des mit den normierten Sentimentattributen und \feature{token\_number} auf Smartphones trainierten Modells auf Armbanduhren
+		\item Erreichte Accuracy: \SI{27.7}{\%}
+		\item Ein Faktor eventuell: Armbanduhren-Reviews sind nur etwa ein Drittel so lang wie Smartphone-Reviews.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Fehlersuche}
@@ -269,10 +302,26 @@
 	\end{block}
 \end{frame}
 
-\begin{frame}{Fazit}
-	Unsere Ergebnisse sind für unseren naiven Ansatz überraschend gut.
-	Um die Accuracy zu verbessern, müssten noch weitere Information über den Kontext und Textstruktur sowie über Negationen einbeziehen.
-	Die Aufgabe wird für eine ausgefeiltere Herangehensweise dadurch erschwert, dass die Texte nicht standardisiert sind.
+\begin{frame}{Schluss}
+
+	\begin{itemize}
+		\item Überraschend gute Ergebnisse für den naiven Ansatz.
+		\item Weitere mögliche Schritte:
+			\begin{itemize}
+				\item Einbezug von Texstruktur
+				\item Einbezug von Negation und anderen privativen Ausdrücken
+			\end{itemize}
+		\item Problem: Textgattung ,,Amazon-Review`` nicht sehr einheitlich
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Literatur}
+	\small
+	\textsc{Rain,} Callen: \textit{Sentiment Analysis in Amazon Reviews Using Probabilistic Machine Learning.} Swarthmore : Department of Computer Science, Swarthmore College, 2013.\\[0.3cm]
+
+	\textsc{Remus,} R.; \textsc{Quasthoff,} U.; \textsc{Heyer,} G.: \textit{SentiWS -- a Publicly Available German-language Resource for Sentiment Analysis.} In: \textit{Proceedings of the 7th International Language Ressources and Evaluation (LREC'10),} Valetta : 2010, S. 1168--1171.\\[0.3cm]
+
+	\textsc{Schmid,} Helmut.: \textit{Probabilistic Part-of-Speech Tagging Using Decision Trees.} In: \textit{Proceedings of International Conference on New Methods in Language Processing,} Manchester : 1994.
 \end{frame}
 
 \end{document}
