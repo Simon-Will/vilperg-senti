@@ -105,7 +105,7 @@
 		\item Unser Projekt: Sentimentanalyse auf Amazon-Reviews\\[0.3cm]
 			\includegraphics[width=\textwidth]{amazon_review_galaxy.png}
 		\item Ziel: Anzahl der für ein Produkt vergebenen Sterne (1--5) aus dem Reviewtext vorhersagen
-		\item Für einen Teil der Auswertung wurden die fünf Klassen binarisiert zu \emph{gut} und \emph{schlecht}.
+		\item Für einen Teil der Auswertung wurden die fünf Klassen binarisiert zu \emph{gut} (4 und 5 Sterne) und \emph{schlecht} (1 bis 3 Sterne).
 	\end{itemize}
 \end{frame}
 
@@ -131,8 +131,8 @@
 			\item \feature{negation}: nach einer Negation werden die drei darauffolgenden Wörter mit \emph{(NOT)} annotiert
 			\item \feature{sentence length}: 
 			\begin{itemize}
-				\item sentence feature für kurze Sätze ($<10$)
-				\item sentence feature für lange Sätze ($>20$)
+				\item sentence feature für kurze Sätze ($<10$ Wörter)
+				\item sentence feature für lange Sätze ($>20$ Wörter))
 			\end{itemize}
 		\item Ergebnisse (Accuracy):
 			\begin{itemize}
@@ -308,7 +308,7 @@
 		\item Überraschend gute Ergebnisse für den naiven Ansatz.
 		\item Weitere mögliche Schritte:
 			\begin{itemize}
-				\item Einbezug von Texstruktur
+				\item Einbezug von Textstruktur
 				\item Einbezug von Negation und anderen privativen Ausdrücken
 			\end{itemize}
 		\item Problem: Textgattung ,,Amazon-Review`` nicht sehr einheitlich
