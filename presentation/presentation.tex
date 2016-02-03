@@ -67,7 +67,7 @@
 \AtBeginSection[]
 {
 	\begin{frame}
-		\frametitle{Table of Contents}
+		\frametitle{Gliederung}
 		\tableofcontents[currentsection]
 	\end{frame}
 }
@@ -93,7 +93,7 @@
 	\titlepage
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Gliederung}
 	\tableofcontents
 \end{frame}
 
@@ -105,7 +105,7 @@
 		\item Unser Projekt: Sentimentanalyse auf Amazon-Reviews\\[0.3cm]
 			\includegraphics[width=\textwidth]{amazon_review_galaxy.png}
 		\item Ziel: Anzahl der für ein Produkt vergebenen Sterne (1--5) aus dem Reviewtext vorhersagen
-		\item Für einen Teil der Auswertuung wurden die fünf Klassen binarisiert zu \emph{gut} und \emph{schlecht}.
+		\item Für einen Teil der Auswertung wurden die fünf Klassen binarisiert zu \emph{gut} und \emph{schlecht}.
 	\end{itemize}
 \end{frame}
 
@@ -154,7 +154,7 @@
 \begin{frame}{Amazon Scraper}
 	\begin{itemize}
 		\item geschrieben in \proglang{python3} mit \pymodule{urllib2}, \pymodule{BeautifulSoup} und \pymodule{lxml}
-		\item ruft eine Überblicksseite auf Amazon auf, auf der Projekte aufgelistet sind und lädt alle Reviews herunter.\\[0.3cm]
+		\item ruft eine Überblicksseite auf Amazon auf, auf der Produkte aufgelistet sind und lädt alle Reviews herunter.\\[0.3cm]
 			\includegraphics[height=0.6\textheight]{amazon_overview_smartphones.png}
 		\item ruft dann die nächste Überblicksseite auf usw.
 	\end{itemize}
