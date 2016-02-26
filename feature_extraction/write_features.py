@@ -12,12 +12,10 @@ import SentiWS_handler
 
 FEATURE_GETTER_DICT = {
         'token_number' : 'fg.Token_number_getter()',
-        'type_number' : 'fg.Type_number_getter()',
         'overall_sentiment' : 'fg.Overall_sentiment_getter(senti_dict)',
         'adjective_sentiment' : 'fg.Adjective_sentiment_getter(senti_dict)',
         'verb_sentiment' : 'fg.Verb_sentiment_getter(senti_dict)',
-        'noun_sentiment' : 'fg.Noun_sentiment_getter(senti_dict)',
-        'keyword_sentiment' : 'fg.Keyword_feature_getter()'
+        'noun_sentiment' : 'fg.Noun_sentiment_getter(senti_dict)'
         }
 
 def get_files(dir_name, f_name, symlinks=False):
