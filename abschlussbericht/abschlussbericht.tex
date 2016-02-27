@@ -1,0 +1,169 @@
+\documentclass[a4paper]{article}
+
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{siunitx}
+
+\usepackage[
+	backend=biber,
+	citestyle=authoryear,
+	sortlocale=de_DE
+]{biblatex}
+\addbibresource{statusbericht.bib}
+
+\newcommand{\ourhighlight}[1]{\textit{#1}}
+\newcommand{\ourfile}[1]{\texttt{#1}}
+\newcommand{\ourextension}[1]{\texttt{#1}}
+
+\title{Abschlussbericht: Sentimentanalyse auf Amazon-Reviews\\[0.5cm]
+\large \textit{Designing Experiments for Machine Learning Tasks}\\[0.2cm]
+\large bei Éva Mújdricza-Maydt\\[0.2cm]
+\large Institut für Computerlinguistik\\[0.2cm]
+\large Ruprecht-Karls-Universität Heidelberg\\}
+
+\author{Caroline Berg \and Simon Will}
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Einführung}
+
+\ourhighlight{Sentiment analysis} als Teilgebiet des maschinellen Lernens verfolgt die Aufgabe, einem gegebenen Text, oder Teilen des Textes, einen entsprechenden \ourhighlight{sentiment}-Wert, d.h. eine Zahl auf einer definierten Skala, die etwas über den Grad der Positivtät, bzw. Negativität des Textes aussagt, zuzuordnen.\newline
+Als Datengrundlage haben wir Review-Texte von Amazon gewählt. Diese schienen sich gut für eine Verarbeitung mithilfe des maschinellen Lernens zu eignen, da ein Kunde, der ein Review verfasst außerdem eine Anzahl von Sternen angeben muss, welche sich als Klassenattribut zum trainieren eines Algorithmus eignet. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{ähnliche Projekte}
+
+Obwohl wir uns nicht direkt an einem bereits vorhandenen Projekt aus diesem Bereich orientiert haben, kann man als vergleichbare Arbeit und zur kritischen Bewertung des Aufbaus unserer Sentiment-Analyse das Projekt \emph{Analyses in Amazon Reviews Using Probablistic Machine Learning} von Callen \textsc{Rain} heranziehen. 
+Es wurden gezielt Texte zu Produkten als Datengrundlage verwendet, die entweder besonders häufig bewertet wurden (z.B. Bücher, CDs, Filme, AmazonKindle) oder kaum Reviews aufwiesen (z.B. LeviJeans, MacBook). Das Problem der unterschiedlichen Verteilung von Reviews mit den jeweiligen Sternen wurde insofern gelöst, als dass nur Reviews mit 5 Sternen (score:1) und Reviews mit 1-2 Sternen (score:0) berücksichtigt wurden. Alle dazwischenliegenden Bewertungen wurden nicht in die Datengrundlage aufgenommen. Zu erwähnende Attribute in diesem Projekt sind zum einen der \emph{bag of words} Ansatz bezüglich der 2000 häufigsten Wörter und der 500 häufigsten Bigramme, die Beachtung von Negation, sowie die Satzlänge der Reviewtexte, wobei besonders lange und besonders kurze Sätze in die Analyse miteinbezogen wurden. Die besten Ergebnisse wurden mit dem \emph{Naïve Bayes Classifier} auf Reviews von AmazonKindle (\SI{84}{\%} accuracy) und dem MacBook (\SI{88.2}{\%} accuracy) erzielt. Zu beachten ist hierbei, dass die baseline bei \SI{50}{\%} liegt, da lediglich binär klassifiziert wurde.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Vorverarbeitung der Daten}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Amazon-Scraper}
+
+Der Amazon-Scraper dient dem Herunterladen der für das Projekt erforderlichen Daten (z.B. bewertetes Produkt, Reviewtext und Anzahl der vergebenen Sterne). Hierbei wird automatisch die jeweils folgende Seite aufgerufen (es werden immer 10 Reviews pro Seite angezeigt) und die gesammelte Datenmenge wird im angegebenen Verzeichnis abgespeichert.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{TreeTagger}
+
+Um die Daten zu formalisieren haben wir uns für den TreeTagger entschieden, welcher die Texte tokenisiert, lemmatisiert und mit POS-Tags versieht. Es wurden überraschend gute Resultate erzielt, beispielsweise wurden klein geschriebene Nomen richtig erkannt.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Chunks}
+
+Mit Blick auf die Verteilung der Sterne auf den heruntergeladenen Daten, fällt sofort auf, dass Produkte meist sehr gute Bewertungen (4-5 Sterne), eher selten sehr schlechte (1 Stern) und kaum mangelhafte Bewertungen (2-3 Sterne) verliehen bekommen.\newline
+Um zu gewährleisten, dass die Algorithmen jeweils auf der gleichen Menge Daten pro Anzahl von Sternen trainieren können, müssen die Daten balanciert werden. 
+Dafür haben wir zunächst randomisierte Symlinks erstellt, die auf ein Review zeigen, und die Links anschließend in balancierten Chunks gespeichert. 
+Durch das Verfahren, welches uns eine ausgewogene Datenmenge zum trainieren bereitstellt, mussten wir allerdings im Schnitt den Verlust von etwa einem Viertel unserer Anfangs heruntergeladenen Daten in Kauf nehmen.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{SentiWS und Attribute}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Sentimentannotation}
+
+Als deutschsprachige Datenbank, um das Sentiment eines Reviews zu bestimmen, bot sich SentiWS an. Es umfasst in etwa 33000 Wortformen und 3500 Lemmata. Dabei wird jedem Wort ein numerischer Wert von -1, für ein negativ konnotiertes Wort, bis 1 zugeordnet. In unserem Fall wird für einen Reviewtext geprüft, welche Wortformen ebenfalls in SentiWS vorkommen. Die aufsummierten Werte werden dann für die jeweilige Wortform (siehe Feature-Extraktion) separat gespeichert.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Attribute}
+
+Zur Extraktion der Features dient ein Python-Programm, das alternativ auch mit einem Shell-Skript aufgerufen werden kann.\newline 
+Das Attribut token\_number gibt die Länge des Reviewtextes an. Desweiteren werden die Sentimentwerte zum einen in Wortklassen eingeteilt. Wir haben jeweils ein Attribut für adjective\_sentiment, noun\_sentiment und verb\_sentiment erstellt. Außerdem enthält das Attribut overall\_sentiment die Summe aller Sentimentwerte, die gefunden wurden.\newline
+Alle Sentiment-Attribute können der \ourextension{arff}-Datei auch in einer normierten Version (Vermerk auf Formel) übergeben werden. 
+Als Klassenattribut kann entweder die Anzahl der Sterne für das jeweilige Review oder in einer weiteren Version das Attribut binary\_judgement, welches allen Reviews mit 1-2 Sternen den Wert 0 und allen Reviews mit 4-5 Sternen den Wert 1 zuteilt, verwendet werden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Experimente und Ergebnisse}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Klassifizierer}
+
+Die besten Resultate haben wir mit folgenden Klassifizierern erzielt:
+\begin{itemize}
+	\item J48 
+	\item RandomForest
+	\item Naïve Bayes
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{erzielte Resultate}
+
+Tabelle einfügen
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Test auf fremder Domäne}
+
+Für das Testen auf einer fremden Domäne haben wir zunächst auf Smartphone-Reviews trainiert, wobei die \ourextension{arff}-Datei mit normierten Sentimentattributen  erstellt wurde. Hierfür haben wir ein ernüchterndes Ergebnis von \SI{27.7}{\%} erzielt, was wir darauf zurückführen, dass Armbanduhren-Reviews im Schnitt nur circa ein Drittel der Länge von Smartphone-Reviews aufweisen. Bei genauerer Betrachtung der Texte fällt auch auf, dass Armbanduhren-Reviews zu einem großen Teil weniger emotionsgeladen formuliert werden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Fazit}
+
+
+Trotz unseres naiven Ansatzes, was die Attributwahl betrifft, haben wir überraschend gute Ergebnisse erzielt.\newline
+Allgemein sollte man bei der Bewertung der Ergebnisse beachten, dass es zwischen den Reviewtexten erhebliche Unterschiede bezüglich der Formulierung, dem Umfang und der Komplexität des Textinhaltes gibt, da den Verfassern keine Normen oder Formalia bezüglich des Inhaltes oder Schreibstils vorgeschrieben werden. Durch diese Variation in Qualität und Quantität der Texte ergeben sich daher Probleme bei der Klassifizierung mittels Lernalgorithmen. 
+Um die Sentimentanalyse zu verfeinern müsste man die Attributwahl etwas komplexer gestalten. Negierende Ausdrücke sollten vermerkt und gegebenenfalls aufgelöst werden.
+Ein weiteres Problem, das beim Sichten der Texte deutlich wird, ist, dass viele Nutzer in ihren Reviewtexten nicht über das eigentliche Produkt schreiben, sondern beispielsweise von ihren Erfahrungen mit ähnlichen Produkten oder den Lieferumständen berichten.\newline
+Um diesem Umstand gerecht zu werden, wäre es nötig, ein Themenattribut einführen, das beispielsweise nur Textabschnitte wertet, welche auch tatsächlich auf das zu bewertende Produkt referieren. Auch die allgemeine Textstruktur könnte für das Sentiment eines Textes ausschlaggebend sein.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Literaturverzeichnis}
+
+
+
+\printbibliography
+
+\end{document}
