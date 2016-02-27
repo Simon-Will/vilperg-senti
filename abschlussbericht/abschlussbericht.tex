@@ -13,6 +13,7 @@
 ]{biblatex}
 \addbibresource{statusbericht.bib}
 
+\usepackage{booktabs}
 \newcommand{\ourhighlight}[1]{\textit{#1}}
 \newcommand{\ourfile}[1]{\texttt{#1}}
 \newcommand{\ourextension}[1]{\texttt{#1}}
@@ -51,7 +52,7 @@ Als Datengrundlage haben wir Review-Texte von Amazon gewählt. Diese schienen si
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{ähnliche Projekte}
+\section{Ähnliche Projekte}
 
 Obwohl wir uns nicht direkt an einem bereits vorhandenen Projekt aus diesem Bereich orientiert haben, kann man als vergleichbare Arbeit und zur kritischen Bewertung des Aufbaus unserer Sentiment-Analyse das Projekt \emph{Analyses in Amazon Reviews Using Probablistic Machine Learning} von Callen \textsc{Rain} heranziehen. 
 Es wurden gezielt Texte zu Produkten als Datengrundlage verwendet, die entweder besonders häufig bewertet wurden (z.B. Bücher, CDs, Filme, AmazonKindle) oder kaum Reviews aufwiesen (z.B. LeviJeans, MacBook). Das Problem der unterschiedlichen Verteilung von Reviews mit den jeweiligen Sternen wurde insofern gelöst, als dass nur Reviews mit 5 Sternen (score:1) und Reviews mit 1-2 Sternen (score:0) berücksichtigt wurden. Alle dazwischenliegenden Bewertungen wurden nicht in die Datengrundlage aufgenommen. Zu erwähnende Attribute in diesem Projekt sind zum einen der \emph{bag of words} Ansatz bezüglich der 2000 häufigsten Wörter und der 500 häufigsten Bigramme, die Beachtung von Negation, sowie die Satzlänge der Reviewtexte, wobei besonders lange und besonders kurze Sätze in die Analyse miteinbezogen wurden. Die besten Ergebnisse wurden mit dem \emph{Naïve Bayes Classifier} auf Reviews von AmazonKindle (\SI{84}{\%} accuracy) und dem MacBook (\SI{88.2}{\%} accuracy) erzielt. Zu beachten ist hierbei, dass die baseline bei \SI{50}{\%} liegt, da lediglich binär klassifiziert wurde.  
@@ -132,7 +133,17 @@ Die besten Resultate haben wir mit folgenden Klassifizierern erzielt:
 
 \subsection{erzielte Resultate}
 
-Tabelle einfügen
+\begin{table}[h]
+\begin{tabular}{lccccc}
+        \toprule
+        Klassen & normiert & Majority Voting & J48 & RandomForest & Naive Bayes \\
+        \midrule
+        1--5 & nein & \SI{20}{\%} &\SI{61.0}{\%} & \SI{67.4}{\%} & \SI{31.6}{\%} \\
+        1--5 & ja & \SI{20}{\%} &\SI{61.0}{\%} & \SI{67.6}{\%} & \SI{32.5}{\%} \\
+        binär & ja & \SI{60}{\%} & \SI{75.0}{\%} & \SI{84.6}{\%} & \SI{69.8}{\%} \\
+        \bottomrule
+\end{tabular}
+\end{table}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
