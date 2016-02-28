@@ -15,8 +15,8 @@ Folgende Programme und Dokumente sind relevant:
     │   └── abschlussbericht.tex
     ├── experimenting
     │   └── MyClassifier
-    │       ├── AttributeSelectionClassify.class
-    │       ├── AttributeSelectionClassify.java
+    │       ├── PermuteAndClassify.class
+    │       ├── PermuteAndClassify.java
     │       ├── ClassifierType.class
     │       └── ClassifierType.java
     ├── feature_extraction
@@ -60,11 +60,11 @@ folgenden Programmiersprachen und die aufgelisteten Pakete benötigt.
     - `lxml`
     - `Beautifulsoup` (`bs4`)
   * Java (getestet mit SE 7)
-    - Weka (getestet mit 3.6.1)
+    - [Weka](http://www.cs.waikato.ac.nz/ml/weka/) (getestet mit 3.6.1)
   * Perl 5
     - `Set::Scalar`
   * Bash
-    - Den [Tree-Tagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/)
+    - [Tree-Tagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/)
     - Tagging-Scripts für den Tree-Tagger
   * AWK
 
@@ -109,7 +109,7 @@ Einzelne Programme
 ### Amazon-Scraper
 
 Das Programm `write_amazon_reviews.py` kann mit einer Überblicksseite über
-Amazon-Produkte (z. B. `http://www.amazon.de/s/ref=sr_nr_n_14?fst=as:off&rh=n:360487031,k:enten&keywords=enten&ie=UTF8&qid=1456479070&rnid=1703609031`)
+Amazon-Produkte (z. B. `http://www.amazon.de/s/ref=sr_nr_n_14?fst=as:off&rh=n:360487031,k:enten&keywords=enten&ie=UTF8&qid=1456479070&rnid=1703609031`)
 und einem Namen für ein anzulegendes Verzeichnis aufgerufen werden und lädt
 dann einige Produktdaten und zugehörige Reviews herunter und speichert sie in
 einer Verzeichnisstruktur unter dem angegebenen Verzeichnis.
@@ -167,10 +167,10 @@ Chunk angeben. (`N` sollte dabei am besten durch 5 teilbar sein.)
 
 Beispielaufruf:
 
-    > perl make_chunks.pl --housing-dir reviews/\
-    --chunk-size 50\
-    --balance\
-    reviews_top_dir/ reviews_chunks/
+    > perl make_chunks.pl --housing-dir reviews/ \
+        --chunk-size 50\
+        --balance\
+        reviews_top_dir/ reviews_chunks/
 
 ### Feature-Extraktion
 
@@ -189,7 +189,7 @@ benötigt mindestens drei Argumente:
     Feature-Dateien geschieht
     * `append`, um an bestehende Feature-Dateien anzuhängen
     * `overwrite`, um bestehende Feature-Dateien zu überschreiben
-    * `updatè`, um nur die in `write_features.sh` angegebenen Features in den
+    * `update`, um nur die in `write_features.sh` angegebenen Features in den
       bestehenden Feature-Dateien zu ändern.
   2. eine SentiWS-Datei
   3. das Verzeichnis, in dem die Reviews leben.
@@ -197,8 +197,8 @@ benötigt mindestens drei Argumente:
 
 Beispielaufruf:
 
-    > bash write_features.sh overwrite /path/to/sentiws_file\
-    reviews_top_dir/ additional_reviews_top_dir/
+    > bash write_features.sh overwrite /path/to/sentiws_file \
+        reviews_top_dir/ additional_reviews_top_dir/
 
 Mit dem Skript `stars_to_features.sh` müssen nun die Sterne aus der
 `info`-Datei in die Feature-Datei geschrieben werden. Das Skript
@@ -227,9 +227,29 @@ Um die Feature-Dateien in ARFF-Format umzuwandeln, wird das Programm
 
 Beispielaufruf:
 
-    > python3 arff_data.py reviews_top_dir/ outfile.arff\
-    overall_sentiment token_number stars
+    > python3 arff_data.py reviews_top_dir/ outfile.arff \
+        overall_sentiment token_number stars
 
 ### Experimente
 
+Das Java-Programm `MyClassifier.PermuteAndClassify` kann verwendet werden, um
+einen Weka-Klassifizierer auf alle möglichen Feature-Permutationen einer
+ARFF-Datei zu trainieren und die Ergebnisse der Evaluation der Modelle in einem
+neuen Verzeichnis zu speichern. Für Details zum Aufruf sei auch hier auf den
+Hilfstext verwiesen:
 
+    > java -cp /path/to/weka.jar:/path/to/vilperg-senti/experimenting \
+        MyClassifier.PermuteAndClassify --help
+
+Ein typischer Aufruf mit zehnfacher Kreuzvalidierung auf der Trainingsdatei
+könnte so aussehen:
+
+    > java -cp /path/to/weka.jar:/path/to/vilperg-senti/experimenting \
+        MyClassifier.PermuteAndClassify train.arff J48_results J48
+
+Die Ergebnisse sind abgepeichert unter `J48/results/`, wobei die Zahlen in den
+Namen den verwendeten Features entsprechen und zwar in der Reihenfolge, wie sie
+in der ursprünglichen ARFF-Datei vorkommen. Für einen schnellen Vergleich der
+erzielten Ergebnisse kann die folgende Pipeline verwendet werden:
+
+  `grep Correctly J48/results/* | column -t | sort -k5`
