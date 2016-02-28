@@ -1,18 +1,18 @@
 # vilperg-senti
-(c) Caroline Berg, Simon Will
-    Februar 2016
-    berg@cl.uni-heidelberg.de
-    will@cl.uni-heidelberg.de
+© Caroline Berg, Simon Will;
+  Februar 2016;
+  berg@cl.uni-heidelberg.de, will@cl.uni-heidelberg.de
 
 ## Mitgelieferte Programme und so
 
 ## Abhängigkeiten
 
-Für die Ausführung der Programme werden Interpreter/Compiler für die folgenden
-Programmiersprachen und die aufgelisteten Pakete benötigt.
+Für die Ausführung der Programme werden Interpreter/Compiler für die
+folgenden Programmiersprachen und die aufgelisteten Pakete benötigt.
 
   * python3
     - urllib
+    - enum
     - lxml
     - Beautifulsoup (bs4)
   * Java SE7
@@ -57,7 +57,8 @@ und einem Namen für ein anzulegendes Verzeichnis aufgerufen werden und lädt
 dann einige Produktdaten und zugehörige Reviews herunter und speichert sie in
 einer Verzeichnisstruktur unter dem angegebenen Verzeichnis.
 
-  `write_amazon_reviews.py start_url out_dir`
+Beispielaufruf:
+  `python3 write_amazon_reviews.py start_url reviews_top_dir/`
 
 ### Preprocessing
 
@@ -77,16 +78,52 @@ nämlich die folgenden:
     - `CMD`
     - `LIB`
 
-  `preprocess.sh out_dir content`
+Beispielaufruf:
+  `> bash preprocess.sh reviews_top_dir/ content`
 
 ### Chunking
+
+Das Perl-Skript `make_chunks.pl` kann dazu benutzt werden, eine Struktur aus
+symbolischen Links zu schaffen, wobei die Links auf bereits vorhandene
+Review-Verzeichnisse verweisen. Die Links werden so in Unterverzeichnissen
+(„Chunks“) angeordnet, dass sich in jedem Chunk von jeder Sternzahl gleich
+viele Reviews befinden. Außerdem werden die Links zufällig auf die Chunks
+verteilt.
+
+Für eine detaillierte Auflistung der Optionen des Skripts, kann der folgende
+Befehl ausgeführt werden:
+
+  `perl make_chunks.pl --help`
+
+Das Skript verlangt mindestens zwei Argumente:
+
+  1. das Verzeichnis, in dem die Reviews leben.
+  2. den Namen des Verzeichnisses, unter dem die Symlink-Struktur entstehen
+    soll.
+
+Ein typischer Aufruf sollte allerdings auch durch `--housing-dir reviews` den
+Namen der Review-Verzeichnisse spezifizieren, mit dem Schalter `--balance` die
+Balancierung aktivieren und mit `--chunk-size N` die Anzahl der Dateien pro
+Chunk angeben. (`N` sollte dabei am besten durch 5 teilbar sein.)
+
+Beispielaufruf:
+  `perl make_chunks.pl --housing-dir reviews/\
+  --chunk-size 50\
+  --balance\
+  reviews_top_dir/ reviews_chunks/`
 
 ### Feature-Extraktion
 
 Die Feature-Extraktion kann mit dem Python-Programm `write_features.py`
-ausgeführt werden. Alternativ kann das Wrapper-Shell-Skript
-`write_features.sh` verwendet werden. Der Aufruf für das Shell-Skript benötigt
-mindestens drei Argumente:
+ausgeführt werden. Für eine detaillierte Auflistung der Optionen dieses
+Programms, kann folgender Befehl ausgeführt werden:
+
+  `> python3 write_features.py --help`
+
+Alternativ zum Python-Programm kann das Wrapper-Shell-Skript
+`write_features.sh` verwendet werden. Die Features werden dann für jedes
+Review in einer Datei 'features' gespeichert. Der Aufruf für das Shell-Skript
+benötigt mindestens drei Argumente:
 
   1. den Ausführmodus, der angibt, was mit bereits extrahierten
     Feature-Dateien geschieht
@@ -95,10 +132,12 @@ mindestens drei Argumente:
     * `updatè`, um nur die in `write_features.sh` angegebenen Features in den
       bestehenden Feature-Dateien zu ändern.
   2. eine SentiWS-Datei
-  3. das Verzeichnis, in dem die Reviews liegen.
+  3. das Verzeichnis, in dem die Reviews leben.
   4. Es können noch zusätzliche Verzeichnisse angegeben werden.
 
-  `write_features.sh overwrite /path/to/sentiws out_dir additional_out_dir`
+Beispielaufruf:
+  `> bash write_features.sh overwrite /path/to/sentiws_file\
+  reviews_top_dir/ additional_reviews_top_dir/`
 
 Mit dem Skript `stars_to_features.sh` müssen nun die Sterne aus der
 `info`-Datei in die Feature-Datei geschrieben werden. Das Skript
@@ -107,9 +146,14 @@ normalisieren und das Skript `add_binary_judgement.sh` fügt das Feature
 `binary_judgement` ein. All diese Skripte müssen für jedes Review einzeln
 angewandt werden, wozu sich der UNIX-Befehl `find` anbietet.
 Eine automatisierte Anwendung dieser drei Skripte bietet das Skript
-`add_additional_features.sh` an.
+`add_additional_features.pl` an.
 
-TODO: `add_additional_features` schreiben und beschreiben!
+`add_additional_features.pl` benötigt als sein einziges Argument das
+Verzeichnis, das die Reviews enthält, zu deren 'features'-Dateien Features
+hinzugefügt werden sollen.
+
+Beispielaufruf:
+  `> perl add_additional_features.pl reviews_top_dir/`
 
 Um die Feature-Dateien in ARFF-Format umzuwandeln, wird das Programm
 `arff_data.py` aufgerufen. Es werden folgende Argumente übergeben:
@@ -119,7 +163,9 @@ Um die Feature-Dateien in ARFF-Format umzuwandeln, wird das Programm
   3. die Namen der Features, die in die ARFF-Datei übernommen werden sollen.
     Es ist zu empfehlen, als letztes Argument das Klassen-Feature anzugeben.
 
-  `arff_data.py out_dir outfile.arff overall_sentiment token_number stars`
+Beispielaufruf:
+  `> python3 arff_data.py reviews_top_dir/ outfile.arff\
+  overall_sentiment token_number stars`
 
 ### Experimente
 
