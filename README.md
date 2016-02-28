@@ -1,42 +1,98 @@
-# vilperg-senti
+vilperg-senti
+=============
 © Caroline Berg, Simon Will;
   Februar 2016;
   berg@cl.uni-heidelberg.de, will@cl.uni-heidelberg.de
 
-## Mitgelieferte Programme und so
+Mitgelieferte Programme und so
+------------------------------
 
-## Abhängigkeiten
+Folgende Programme und Dokumente sind relevant:
+
+    vilperg-senti/
+    ├── abschlussbericht
+    │   ├── abschlussbericht.pdf
+    │   └── abschlussbericht.tex
+    ├── experimenting
+    │   └── MyClassifier
+    │       ├── AttributeSelectionClassify.class
+    │       ├── AttributeSelectionClassify.java
+    │       ├── ClassifierType.class
+    │       └── ClassifierType.java
+    ├── feature_extraction
+    │   ├── add_additional_features.pl
+    │   ├── add_binary_judgement.sh
+    │   ├── arff_data.py
+    │   ├── feature_getter.py
+    │   ├── normalize_features.sh
+    │   ├── SentiWS_handler.py
+    │   ├── stars_to_features.sh
+    │   ├── write_features.py
+    │   └── write_features.sh
+    ├── get_amazon_reviews
+    │   ├── vilperg_amazonreview.py
+    │   └── write_amazon_reviews.py
+    ├── preprocess_extractfeatures_makearff.pl
+    ├── preprocessing
+    │   ├── my_tree_tagger.sh
+    │   └── preprocess.sh
+    ├── presentation
+    │   ├── beamerthemeheidelberg.sty
+    │   ├── presentation.pdf
+    │   └── presentation.tex
+    ├── README.md
+    ├── review_chunking
+    │   ├── make_chunks.pl
+    │   └── make_chunks.sh
+    └── statusbericht
+        ├── statusbericht.pdf
+        └── statusbericht.tex
+
+Abhängigkeiten
+--------------
 
 Für die Ausführung der Programme werden Interpreter/Compiler für die
 folgenden Programmiersprachen und die aufgelisteten Pakete benötigt.
 
-  * python3
-    - urllib
-    - enum
-    - lxml
-    - Beautifulsoup (bs4)
-  * Java SE7
-    - Weka (3.6.1 oder neuer)
+  * Python 3
+    - `urllib`
+    - `enum`
+    - `lxml`
+    - `Beautifulsoup` (`bs4`)
+  * Java (getestet mit SE 7)
+    - Weka (getestet mit 3.6.1)
   * Perl 5
-    - Set::Scalar
+    - `Set::Scalar`
   * Bash
     - Den [Tree-Tagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/)
     - Tagging-Scripts für den Tree-Tagger
   * AWK
 
-Für die Kompilierung der LaTeX-Dateien werden folgende Pakete benötigt:
-  * babel
-  * inputenc
-  * fontenc
-  * lmodern
-  * biblatex (und biber)
+Für die Kompilierung der LaTeX-Dateien werden das Programm `biber` sowie
+folgende Pakete benötigt:
+
+  * `adjustbox`
+  * `babel`
+  * `beamer`
+  * `biblatex`
+  * `booktabs`
+  * `color`
+  * `floatflt`
+  * `fontenc`
+  * `graphicx`
+  * `hyperref`
+  * `inputenc`
+  * `listings`
+  * `lmodern`
+  * `siunitx`
 
 Außerdem ist eine Datei nötig, die Wortformen „Sentiment-Scores“ zuordnet.
 Wir empfehlen
 [SentiWS](http://asv.informatik.uni-leipzig.de/download/sentiws.html),
 aber jede gleich formatierte Datei funktioniert genauso.
 
-## Überblick
+Überblick
+---------
 
 Die Programme in diesem Projekt ermöglichen, Amazon-Reviews zu bestimmten
 Produktklassen herunterzuladen, sie (mit dem TreeTagger und den zugehörigen
@@ -47,7 +103,8 @@ ARFF-Format können in WEKA verarbeitet werden. Das kann man entweder selbst
 mit in der graphischen Oberfläche von WEKA oder automatisiert mit einem der
 Programme tun.
 
-## Einzelne Programme
+Einzelne Programme
+------------------
 
 ### Amazon-Scraper
 
@@ -58,14 +115,15 @@ dann einige Produktdaten und zugehörige Reviews herunter und speichert sie in
 einer Verzeichnisstruktur unter dem angegebenen Verzeichnis.
 
 Beispielaufruf:
-  `python3 write_amazon_reviews.py start_url reviews_top_dir/`
+
+    python3 write_amazon_reviews.py start_url reviews_top_dir/
 
 ### Preprocessing
 
 Das Programm `preprocess.sh` kann aufgerufen werden mit dem Namen des
 Verzeichnisses, in dem die Reviews liegen (z. B. `out_dir`, das beim
 Amazon-Scraper angegeben wurde), und dem Namen der Dateien, die den
-Review-Text enthalten (`content` im Normalfall).
+Review-Text enthalten (im Normalfall `'content'`).
 
 In den Programmen `preprocess.sh` und `my_tree_tagger.sh` müssen einige
 Variablen, die Pfade zu Tagger-Skripten enthalten, richtig eingestellt werden,
@@ -79,7 +137,8 @@ nämlich die folgenden:
     - `LIB`
 
 Beispielaufruf:
-  `> bash preprocess.sh reviews_top_dir/ content`
+
+    > bash preprocess.sh reviews_top_dir/ content
 
 ### Chunking
 
@@ -93,7 +152,7 @@ verteilt.
 Für eine detaillierte Auflistung der Optionen des Skripts, kann der folgende
 Befehl ausgeführt werden:
 
-  `perl make_chunks.pl --help`
+    perl make_chunks.pl --help
 
 Das Skript verlangt mindestens zwei Argumente:
 
@@ -107,10 +166,11 @@ Balancierung aktivieren und mit `--chunk-size N` die Anzahl der Dateien pro
 Chunk angeben. (`N` sollte dabei am besten durch 5 teilbar sein.)
 
 Beispielaufruf:
-  `perl make_chunks.pl --housing-dir reviews/\
-  --chunk-size 50\
-  --balance\
-  reviews_top_dir/ reviews_chunks/`
+
+    perl make_chunks.pl --housing-dir reviews/\
+    --chunk-size 50\
+    --balance\
+    reviews_top_dir/ reviews_chunks/
 
 ### Feature-Extraktion
 
@@ -118,7 +178,7 @@ Die Feature-Extraktion kann mit dem Python-Programm `write_features.py`
 ausgeführt werden. Für eine detaillierte Auflistung der Optionen dieses
 Programms, kann folgender Befehl ausgeführt werden:
 
-  `> python3 write_features.py --help`
+    > python3 write_features.py --help
 
 Alternativ zum Python-Programm kann das Wrapper-Shell-Skript
 `write_features.sh` verwendet werden. Die Features werden dann für jedes
@@ -136,8 +196,9 @@ benötigt mindestens drei Argumente:
   4. Es können noch zusätzliche Verzeichnisse angegeben werden.
 
 Beispielaufruf:
-  `> bash write_features.sh overwrite /path/to/sentiws_file\
-  reviews_top_dir/ additional_reviews_top_dir/`
+
+    > bash write_features.sh overwrite /path/to/sentiws_file\
+    reviews_top_dir/ additional_reviews_top_dir/
 
 Mit dem Skript `stars_to_features.sh` müssen nun die Sterne aus der
 `info`-Datei in die Feature-Datei geschrieben werden. Das Skript
@@ -153,7 +214,8 @@ Verzeichnis, das die Reviews enthält, zu deren 'features'-Dateien Features
 hinzugefügt werden sollen.
 
 Beispielaufruf:
-  `> perl add_additional_features.pl reviews_top_dir/`
+
+    > perl add_additional_features.pl reviews_top_dir/
 
 Um die Feature-Dateien in ARFF-Format umzuwandeln, wird das Programm
 `arff_data.py` aufgerufen. Es werden folgende Argumente übergeben:
@@ -164,8 +226,9 @@ Um die Feature-Dateien in ARFF-Format umzuwandeln, wird das Programm
     Es ist zu empfehlen, als letztes Argument das Klassen-Feature anzugeben.
 
 Beispielaufruf:
-  `> python3 arff_data.py reviews_top_dir/ outfile.arff\
-  overall_sentiment token_number stars`
+
+    > python3 arff_data.py reviews_top_dir/ outfile.arff\
+    overall_sentiment token_number stars
 
 ### Experimente
 
