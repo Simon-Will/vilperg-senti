@@ -1,8 +1,10 @@
 vilperg-senti
 =============
-© Caroline Berg, Simon Will;
-  Februar 2016;
-  berg@cl.uni-heidelberg.de, will@cl.uni-heidelberg.de
+Caroline Berg, Simon Will
+
+Februar 2016
+
+berg@cl.uni-heidelberg.de, will@cl.uni-heidelberg.de
 
 Mitgelieferte Programme und so
 ------------------------------
@@ -252,4 +254,4 @@ Namen den verwendeten Features entsprechen und zwar in der Reihenfolge, wie sie
 in der ursprünglichen ARFF-Datei vorkommen. Für einen schnellen Vergleich der
 erzielten Ergebnisse kann die folgende Pipeline verwendet werden:
 
-  `grep Correctly J48/results/* | column -t | sort -k5`
+  `> grep Correctly J48/results/* | column -t | sort -k5`
