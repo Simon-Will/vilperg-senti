@@ -68,11 +68,11 @@ our @features = qw(
 sub main {
     my $top_dir = shift;
     my $arff_name = shift;
-    $chunk_dir = $top_dir unless $chunk_dir;
+    $chunk_dir = "${top_dir}_chunks" unless $chunk_dir;
     
     # Preprocess the review content.
     $verbose && print "Preprocessing the review content ...\n";
-    #system($preprocess, $top_dir, 'content', '> /dev/null');
+    `$preprocess $top_dir content 2>&1 1>/dev/null`;
 
     # Arrange reviews in chunks.
     $verbose && print "Chunking the reviews ...\n";
