@@ -65,6 +65,7 @@ folgenden Programmiersprachen und die aufgelisteten Pakete benötigt.
     - [Weka](http://www.cs.waikato.ac.nz/ml/weka/) (getestet mit 3.6.1)
   * Perl 5
     - `Set::Scalar`
+    - `IPC::System::Simple`
   * Bash
     - [Tree-Tagger](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/)
     - Tagging-Scripts für den Tree-Tagger
@@ -169,7 +170,7 @@ Chunk angeben. (`N` sollte dabei am besten durch 5 teilbar sein.)
 
 Beispielaufruf:
 
-    > perl make_chunks.pl --housing-dir reviews/ \
+    > perl make_chunks.pl --housing-dir reviews \
         --chunk-size 50\
         --balance\
         reviews_top_dir/ reviews_chunks/
